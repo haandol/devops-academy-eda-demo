@@ -67,10 +67,8 @@ func (r *TripRepository) Create(ctx context.Context, tripID string) (dto.Trip, e
 
 func (r *TripRepository) Complete(ctx context.Context, evt *event.FlightBooked) error {
 	now := time.Now().Format(time.RFC3339)
-	update := expression.Set(expression.Name("GS1PK"), expression.Value(fmt.Sprintf("STATUS#%s", status.TripBooked))).
-		Set(expression.Name("FlightID"), expression.Value(evt.Body.FlightID)).
-		Set(expression.Name("FlightBookingID"), expression.Value(evt.Body.BookingID)).
-		Set(expression.Name("Status"), expression.Value(status.TripBooked)).
+	update := expression.Set(expression.Name("GS1PK"), expression.Value(fmt.Sprintf("STATUS#%s", status.TripReserved))).
+		Set(expression.Name("Status"), expression.Value(status.TripReserved)).
 		Set(expression.Name("UpdatedAt"), expression.Value(now))
 	updateExpr, err := expression.NewBuilder().WithUpdate(update).Build()
 	if err != nil {
@@ -81,7 +79,7 @@ func (r *TripRepository) Complete(ctx context.Context, evt *event.FlightBooked) 
 	if err != nil {
 		return err
 	}
-	sk, err := attributevalue.Marshal("begins_with(SK, #TRIP#)")
+	sk, err := attributevalue.Marshal(fmt.Sprintf("#TRIP#%s", evt.Body.TripID))
 	if err != nil {
 		return err
 	}
