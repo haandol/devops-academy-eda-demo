@@ -27,6 +27,12 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  dynamodb:
+    image: amazon/dynamodb-local:1.21.0
+    restart: always
+    profiles: ["backend"]
+    ports:
+      - '8000:8000'
   kafka-ui:
     depends_on:
       - kafka
@@ -53,6 +59,8 @@ services:
     image: cosmtrek/air:v1.41.0
     profiles: ["dev"]
     working_dir: /src
+    stop_signal: SIGINT
+    stop_grace_period: 5s
     volumes:
       - .:/src
       - ~/.aws:/root/.aws

@@ -24,26 +24,13 @@ type Kafka struct {
 }
 
 type Database struct {
-	Host               string
-	Port               int
-	Name               string
-	Username           string
-	Password           string
-	SecretID           string
-	MaxOpenConnections int `validate:"required,number"`
-	MaxIdleConnections int `validate:"required,number"`
-}
-
-type Relay struct {
-	FetchSize        int `validate:"required,number"`
-	FetchIntervalMil int `validate:"required,number"`
+	TableName string
 }
 
 type Config struct {
-	App    App
-	Kafka  Kafka
-	TripDB Database
-	Relay  Relay
+	App      App
+	Kafka    Kafka
+	Database Database
 }
 
 // Load config.Config from environment variables for each stage
@@ -70,39 +57,13 @@ func Load() Config {
 			MessageExpirySec: getEnv("KAFKA_MESSAGE_EXPIRY_SEC").Int(),
 			BatchSize:        getEnv("KAFKA_BATCH_SIZE").Int(),
 		},
-		TripDB: Database{
-			Host:               getEnv("DB_HOST").String(),
-			Port:               getEnv("DB_PORT").Int(),
-			Name:               getEnv("DB_NAME").String(),
-			Username:           getEnv("DB_USERNAME").String(),
-			Password:           getEnv("DB_PASSWORD").String(),
-			SecretID:           getEnv("DB_SECRET_ID").String(),
-			MaxOpenConnections: getEnv("DB_MAX_OPEN_CONNECTIONS").Int(),
-			MaxIdleConnections: getEnv("DB_MAX_IDLE_CONNECTIONS").Int(),
-		},
-		Relay: Relay{
-			FetchSize:        getEnv("RELAY_FETCH_SIZE").Int(),
-			FetchIntervalMil: getEnv("RELAY_FETCH_INTERVAL_MIL").Int(),
+		Database: Database{
+			TableName: getEnv("DB_TABLE_NAME").String(),
 		},
 	}
 
 	if err := util.ValidateStruct(cfg); err != nil {
 		log.Panicf("Error validating config: %s", err)
-	}
-
-	if cfg.TripDB.SecretID == "" {
-		if err := util.ValidateVar(cfg.TripDB.Host, "required"); err != nil {
-			log.Panicf("Error validating config: %s", err)
-		}
-		if err := util.ValidateVar(cfg.TripDB.Port, "required"); err != nil {
-			log.Panicf("Error validating config: %s", err)
-		}
-		if err := util.ValidateVar(cfg.TripDB.Username, "required"); err != nil {
-			log.Panicf("Error validating config: %s", err)
-		}
-		if err := util.ValidateVar(cfg.TripDB.Password, "required"); err != nil {
-			log.Panicf("Error validating config: %s", err)
-		}
 	}
 
 	return cfg

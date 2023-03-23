@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 )
 
 var awsCfg *AWSConfig
@@ -18,7 +18,7 @@ func GetAWSConfig() (*AWSConfig, error) {
 		return awsCfg, nil
 	}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion("ap-northeast-2"))
 	if err != nil {
 		return nil, err
 	}

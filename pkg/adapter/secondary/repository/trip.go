@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/haandol/devops-academy-eda-demo/pkg/config"
 	"github.com/haandol/devops-academy-eda-demo/pkg/constant/status"
 	"github.com/haandol/devops-academy-eda-demo/pkg/dto"
 	"github.com/haandol/devops-academy-eda-demo/pkg/entity"
@@ -18,23 +19,21 @@ import (
 )
 
 type TripRepository struct {
-	client *dynamodb.Client
+	TableName string
+	Client    *dynamodb.Client
 }
 
-func NewTripRepository(client *dynamodb.Client) *TripRepository {
+func NewTripRepository(
+	cfg *config.Config,
+	client *dynamodb.Client,
+) *TripRepository {
 	return &TripRepository{
-		client: client,
+		TableName: cfg.Database.TableName,
+		Client:    client,
 	}
 }
 
 func (r *TripRepository) Create(ctx context.Context, tripID string) (dto.Trip, error) {
-	condition := expression.AttributeNotExists(expression.Name("PK"))
-	condition.And(expression.AttributeNotExists(expression.Name("SK")))
-	condExpr, err := expression.NewBuilder().WithCondition(condition).Build()
-	if err != nil {
-		return dto.Trip{}, err
-	}
-
 	now := time.Now().Format(time.RFC3339)
 	req := &entity.Trip{
 		PK:        fmt.Sprintf("TRIP#%s", tripID),
@@ -54,10 +53,10 @@ func (r *TripRepository) Create(ctx context.Context, tripID string) (dto.Trip, e
 		return dto.Trip{}, err
 	}
 
-	_, err = r.client.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName:           aws.String("trip"),
+	_, err = r.Client.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName:           aws.String(r.TableName),
 		Item:                item,
-		ConditionExpression: condExpr.Condition(),
+		ConditionExpression: aws.String("attribute_not_exists(PK) AND attribute_not_exists(SK)"),
 	})
 	if err != nil {
 		return dto.Trip{}, err
@@ -68,19 +67,12 @@ func (r *TripRepository) Create(ctx context.Context, tripID string) (dto.Trip, e
 
 func (r *TripRepository) Complete(ctx context.Context, evt *event.FlightBooked) error {
 	now := time.Now().Format(time.RFC3339)
-	update := expression.Set(expression.Name("GS1PK"), expression.Value(fmt.Sprintf("STATUS#%s", status.TripBooked)))
-	update.Set(expression.Name("flightID"), expression.Value(evt.Body.FlightID))
-	update.Set(expression.Name("flightBookingID"), expression.Value(evt.Body.BookingID))
-	update.Set(expression.Name("status"), expression.Value(status.TripBooked))
-	update.Set(expression.Name("updatedAt"), expression.Value(now))
+	update := expression.Set(expression.Name("GS1PK"), expression.Value(fmt.Sprintf("STATUS#%s", status.TripBooked))).
+		Set(expression.Name("FlightID"), expression.Value(evt.Body.FlightID)).
+		Set(expression.Name("FlightBookingID"), expression.Value(evt.Body.BookingID)).
+		Set(expression.Name("Status"), expression.Value(status.TripBooked)).
+		Set(expression.Name("UpdatedAt"), expression.Value(now))
 	updateExpr, err := expression.NewBuilder().WithUpdate(update).Build()
-	if err != nil {
-		return err
-	}
-
-	condition := expression.AttributeExists(expression.Name("PK"))
-	condition.And(expression.AttributeExists(expression.Name("SK")))
-	condExpr, err := expression.NewBuilder().WithCondition(condition).Build()
 	if err != nil {
 		return err
 	}
@@ -89,24 +81,44 @@ func (r *TripRepository) Complete(ctx context.Context, evt *event.FlightBooked) 
 	if err != nil {
 		return err
 	}
-	sk, err := attributevalue.Marshal(fmt.Sprintf("#TRIP#%s", evt.Body.TripID))
+	sk, err := attributevalue.Marshal("begins_with(SK, #TRIP#)")
 	if err != nil {
 		return err
 	}
 
-	_, err = r.client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
-		TableName:                 aws.String("trip"),
+	_, err = r.Client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+		TableName:                 aws.String(r.TableName),
 		Key:                       map[string]types.AttributeValue{"PK": pk, "SK": sk},
 		ExpressionAttributeNames:  updateExpr.Names(),
 		ExpressionAttributeValues: updateExpr.Values(),
 		UpdateExpression:          updateExpr.Update(),
-		ConditionExpression:       condExpr.Condition(),
+		ConditionExpression:       aws.String("attribute_exists(PK) AND attribute_exists(SK)"),
 	})
 	return err
 }
 
 func (r *TripRepository) List(ctx context.Context) ([]dto.Trip, error) {
+	filt := expression.Name("SK").BeginsWith("#TRIP#")
+	expr, err := expression.NewBuilder().WithFilter(filt).Build()
+	if err != nil {
+		return []dto.Trip{}, err
+	}
+
+	res, err := r.Client.Scan(ctx, &dynamodb.ScanInput{
+		TableName:                 aws.String(r.TableName),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+		FilterExpression:          expr.Filter(),
+		Limit:                     aws.Int32(100),
+	})
+	if err != nil {
+		return []dto.Trip{}, err
+	}
+
 	var rows []dto.Trip
+	if err := attributevalue.UnmarshalListOfMaps(res.Items, &rows); err != nil {
+		return []dto.Trip{}, err
+	}
 
 	return rows, nil
 }

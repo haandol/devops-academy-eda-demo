@@ -20,6 +20,7 @@ func NewTripService(
 	tripRepository repositoryport.TripRepository,
 ) *TripService {
 	return &TripService{
+		tripProducer:   tripProducer,
 		tripRepository: tripRepository,
 	}
 }
@@ -37,6 +38,7 @@ func (s *TripService) Create(ctx context.Context, tripID string) (dto.Trip, erro
 		return dto.Trip{}, err
 	}
 
+	logger.Infow("publishing TripCreated", "trip", trip, "producer", s.tripProducer)
 	if err := s.tripProducer.PublishTripCreated(ctx, &trip); err != nil {
 		logger.Errorw("failed to publish TripCreated", "trip", trip, "err", err)
 		return dto.Trip{}, err

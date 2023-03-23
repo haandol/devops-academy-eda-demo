@@ -2,7 +2,6 @@ package cerrors
 
 type CodedError struct {
 	Code int
-	Msg  string
 	Err  error
 }
 

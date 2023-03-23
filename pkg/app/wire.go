@@ -41,7 +41,6 @@ func provideProducer(cfg *config.Config) *kafkaproducer.KafkaProducer {
 
 // TripApp
 func provideTripProducer(
-	cfg *config.Config,
 	kafkaProducer *kafkaproducer.KafkaProducer,
 ) *producer.TripProducer {
 	return producer.NewTripProducer(kafkaProducer)
@@ -89,7 +88,6 @@ func InitTripApp(cfg *config.Config) port.App {
 
 // CarApp
 func provideCarProducer(
-	cfg *config.Config,
 	kafkaProducer *kafkaproducer.KafkaProducer,
 ) *producer.CarProducer {
 	return producer.NewCarProducer(kafkaProducer)
@@ -122,7 +120,6 @@ func InitCarApp(cfg *config.Config) port.App {
 
 // HotelApp
 func provideHotelProducer(
-	cfg *config.Config,
 	kafkaProducer *kafkaproducer.KafkaProducer,
 ) *producer.HotelProducer {
 	return producer.NewHotelProducer(kafkaProducer)
@@ -155,7 +152,6 @@ func InitHotelApp(cfg *config.Config) port.App {
 
 // FlightApp
 func provideFlightProducer(
-	cfg *config.Config,
 	kafkaProducer *kafkaproducer.KafkaProducer,
 ) *producer.FlightProducer {
 	return producer.NewFlightProducer(kafkaProducer)

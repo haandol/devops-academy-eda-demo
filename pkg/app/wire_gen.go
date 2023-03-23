@@ -28,9 +28,9 @@ func InitTripApp(cfg *config.Config) port.App {
 	ginRouter := router.NewGinRouter(cfg)
 	server := router.NewServerForce(cfg, ginRouter)
 	kafkaProducer := provideProducer(cfg)
-	tripProducer := provideTripProducer(cfg, kafkaProducer)
+	tripProducer := provideTripProducer(kafkaProducer)
 	client := provideDbClient(cfg)
-	tripRepository := repository.NewTripRepository(client)
+	tripRepository := repository.NewTripRepository(cfg, client)
 	tripService := service.NewTripService(tripProducer, tripRepository)
 	tripRouter := router.NewTripRouter(tripService)
 	tripConsumer := provideTripConsumer(cfg, tripService)
@@ -42,9 +42,9 @@ func InitCarApp(cfg *config.Config) port.App {
 	ginRouter := router.NewGinRouter(cfg)
 	server := router.NewServer(cfg, ginRouter)
 	kafkaProducer := provideProducer(cfg)
-	carProducer := provideCarProducer(cfg, kafkaProducer)
+	carProducer := provideCarProducer(kafkaProducer)
 	client := provideDbClient(cfg)
-	carRepository := repository.NewCarRepository(client)
+	carRepository := repository.NewCarRepository(cfg, client)
 	carService := service.NewCarService(carProducer, carRepository)
 	carConsumer := provideCarConsumer(cfg, carService)
 	carApp := NewCarApp(server, carConsumer)
@@ -55,9 +55,9 @@ func InitHotelApp(cfg *config.Config) port.App {
 	ginRouter := router.NewGinRouter(cfg)
 	server := router.NewServer(cfg, ginRouter)
 	kafkaProducer := provideProducer(cfg)
-	hotelProducer := provideHotelProducer(cfg, kafkaProducer)
+	hotelProducer := provideHotelProducer(kafkaProducer)
 	client := provideDbClient(cfg)
-	hotelRepository := repository.NewHotelRepository(client)
+	hotelRepository := repository.NewHotelRepository(cfg, client)
 	hotelService := service.NewHotelService(hotelProducer, hotelRepository)
 	hotelConsumer := provideHotelConsumer(cfg, hotelService)
 	hotelApp := NewHotelApp(server, hotelConsumer)
@@ -68,9 +68,9 @@ func InitFlightApp(cfg *config.Config) port.App {
 	ginRouter := router.NewGinRouter(cfg)
 	server := router.NewServer(cfg, ginRouter)
 	kafkaProducer := provideProducer(cfg)
-	flightProducer := provideFlightProducer(cfg, kafkaProducer)
+	flightProducer := provideFlightProducer(kafkaProducer)
 	client := provideDbClient(cfg)
-	flightRepository := repository.NewFlightRepository(client)
+	flightRepository := repository.NewFlightRepository(cfg, client)
 	flightService := service.NewFlightService(flightProducer, flightRepository)
 	flightConsumer := provideFlightConsumer(cfg, flightService)
 	flightApp := NewFlightApp(server, flightConsumer)
@@ -99,7 +99,6 @@ func provideProducer(cfg *config.Config) *producer.KafkaProducer {
 
 // TripApp
 func provideTripProducer(
-	cfg *config.Config,
 	kafkaProducer *producer.KafkaProducer,
 ) *producer2.TripProducer {
 	return producer2.NewTripProducer(kafkaProducer)
@@ -119,7 +118,6 @@ var provideRouters = wire.NewSet(router.NewGinRouter, wire.Bind(new(http.Handler
 
 // CarApp
 func provideCarProducer(
-	cfg *config.Config,
 	kafkaProducer *producer.KafkaProducer,
 ) *producer2.CarProducer {
 	return producer2.NewCarProducer(kafkaProducer)
@@ -135,7 +133,6 @@ func provideCarConsumer(
 
 // HotelApp
 func provideHotelProducer(
-	cfg *config.Config,
 	kafkaProducer *producer.KafkaProducer,
 ) *producer2.HotelProducer {
 	return producer2.NewHotelProducer(kafkaProducer)
@@ -151,7 +148,6 @@ func provideHotelConsumer(
 
 // FlightApp
 func provideFlightProducer(
-	cfg *config.Config,
 	kafkaProducer *producer.KafkaProducer,
 ) *producer2.FlightProducer {
 	return producer2.NewFlightProducer(kafkaProducer)

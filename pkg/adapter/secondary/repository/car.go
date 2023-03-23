@@ -7,10 +7,10 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
+	"github.com/haandol/devops-academy-eda-demo/pkg/config"
 	"github.com/haandol/devops-academy-eda-demo/pkg/constant/status"
 	"github.com/haandol/devops-academy-eda-demo/pkg/dto"
 	"github.com/haandol/devops-academy-eda-demo/pkg/entity"
@@ -18,12 +18,17 @@ import (
 )
 
 type CarRepository struct {
-	client *dynamodb.Client
+	TableName string
+	Client    *dynamodb.Client
 }
 
-func NewCarRepository(client *dynamodb.Client) *CarRepository {
+func NewCarRepository(
+	cfg *config.Config,
+	client *dynamodb.Client,
+) *CarRepository {
 	return &CarRepository{
-		client: client,
+		TableName: cfg.Database.TableName,
+		Client:    client,
 	}
 }
 
@@ -34,17 +39,11 @@ func (r *CarRepository) Book(ctx context.Context, tripID string) (dto.CarBooking
 		return booking, nil
 	}
 
-	condition := expression.AttributeNotExists(expression.Name("PK"))
-	condition.And(expression.AttributeNotExists(expression.Name("SK")))
-	condExpr, err := expression.NewBuilder().WithCondition(condition).Build()
-	if err != nil {
-		return dto.CarBooking{}, err
-	}
-
+	bookingID := uuid.NewString()
 	req := &entity.CarBooking{
-		PK:        fmt.Sprintf("BOOKING#CAR#%s", tripID),
-		SK:        fmt.Sprintf("#BOOKING#CAR#%s", tripID),
-		ID:        uuid.NewString(),
+		PK:        fmt.Sprintf("TRIP#%s", tripID),
+		SK:        fmt.Sprintf("BOOKING#CAR#%s", bookingID),
+		ID:        bookingID,
 		TripID:    tripID,
 		CarID:     uuid.NewString(),
 		Status:    status.Booked,
@@ -59,10 +58,10 @@ func (r *CarRepository) Book(ctx context.Context, tripID string) (dto.CarBooking
 		return dto.CarBooking{}, err
 	}
 
-	_, err = r.client.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName:           aws.String("trip"),
+	_, err = r.Client.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName:           aws.String(r.TableName),
 		Item:                item,
-		ConditionExpression: condExpr.Condition(),
+		ConditionExpression: aws.String("attribute_not_exists(PK) AND attribute_not_exists(SK)"),
 	})
 	if err != nil {
 		return dto.CarBooking{}, err
@@ -72,17 +71,17 @@ func (r *CarRepository) Book(ctx context.Context, tripID string) (dto.CarBooking
 }
 
 func (r *CarRepository) GetByTripID(ctx context.Context, tripID string) (dto.CarBooking, error) {
-	pk, err := attributevalue.Marshal(fmt.Sprintf("BOOKING#CAR#%s", tripID))
+	pk, err := attributevalue.Marshal(fmt.Sprintf("TRIP#%s", tripID))
 	if err != nil {
 		return dto.CarBooking{}, err
 	}
-	sk, err := attributevalue.Marshal(fmt.Sprintf("#BOOKING#CAR#%s", tripID))
+	sk, err := attributevalue.Marshal("begins_with(SK, BOOKING#CAR#)")
 	if err != nil {
 		return dto.CarBooking{}, err
 	}
 
-	res, err := r.client.GetItem(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String("trip"),
+	res, err := r.Client.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(r.TableName),
 		Key:       map[string]types.AttributeValue{"PK": pk, "SK": sk},
 	})
 	if err != nil {
