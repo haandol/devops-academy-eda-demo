@@ -1,0 +1,18 @@
+@startuml context
+!include <c4/C4_Context.puml>  
+
+title Context Diagram
+
+Person(client, "User", "여행예약 시스템 이용자")
+
+System_Boundary(b0, "Demo System") {
+  System(trip, "Trip Reservation System", "여행정보를 입력받아 차량, 호텔, 비행기를 한번에 예약해주는 시스템")
+  SystemDb(db, "Database", "여행에 관련된 모든 정보(차량, 호텔, 비행기 예약 정보)를 저장")
+}
+
+Rel(client, trip, "여행정보 전달", "HTTP")
+Rel(trip, trip, "차량, 호텔, 비행편 예약", "Events")
+Rel(trip, db, "각 예약정보에 대한 정보 저장")
+
+LAYOUT_WITH_LEGEND()
+@enduml

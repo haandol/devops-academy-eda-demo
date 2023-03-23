@@ -1,0 +1,25 @@
+@startuml overall-container
+!include <c4/C4_Container.puml>  
+
+title Overall Container Diagram
+
+Person(client, "User", "여행예약 시스템 이용자")
+
+Container_Boundary(b0, "Trip Reservation System") {
+  Container(trip, "Trip Service", "golang",  "여행정보를 입력받아 차량, 호텔, 비행기를 한번에 예약해주는 서비스")
+  Container(car, "Car Service", "golang",  "지정된 여행에 대한 차량을 예약해주는 서비스")
+  Container(hotel, "Hotel Service", "golang",  "지정된 여행에 대한 호텔을 예약해주는 서비스")
+  Container(flight, "Flight Service", "golang",  "지정된 여행에 대한 비행기를 예약해주는 서비스")
+}
+
+ContainerDb(db, "Trip DB", "DynamoDB", "여행정보를 저장하는 DB")
+
+Rel(client, trip, "1. 여행예약 요청", "HTTP")
+Rel_Neighbor(trip, db, "2. 여행정보 저장", "HTTPS")
+Rel(trip, car, "3. TripCreated 이벤트 발생", "Kafka")
+Rel(car, hotel, "4. CarBooked 이벤트 발생", "Kafka")
+Rel(hotel, flight, "5. HotelBooked 이벤트 발생", "Kafka")
+Rel(flight, trip, "6. FlightBooked 이벤트 발생", "Kafka")
+
+LAYOUT_WITH_LEGEND()
+@enduml

@@ -1,0 +1,22 @@
+FROM golang:1.20.2
+LABEL maintainer="ldg55d@gmail.com"
+
+WORKDIR /src
+
+# set environment path
+ENV PATH /go/bin:$PATH
+ENV GONOSUMDB github.com/haandol
+ENV GOPRIVATE github.com/haandol
+
+# create ssh directory
+RUN mkdir ~/.ssh
+RUN touch ~/.ssh/known_hosts
+RUN ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+# manage dependencies
+COPY go.mod go.sum ./
+# disable proxy for VPN
+RUN go env -w GOPROXY=direct
+RUN go mod download
+
+RUN go install github.com/google/wire/cmd/wire@latest
