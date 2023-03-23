@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"go.opentelemetry.io/contrib/detectors/aws/eks"
+	"go.opentelemetry.io/contrib/detectors/aws/ecs"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -84,8 +84,8 @@ func initTracer(endpoint string) ShutdownFunc {
 		log.Fatalf("failed to create new OTLP trace exporter: %v", err)
 	}
 
-	// AWS EKS resource
-	resourceDetector := eks.NewResourceDetector()
+	// AWS ECS resource
+	resourceDetector := ecs.NewResourceDetector()
 	resource, err := resourceDetector.Detect(context.Background())
 	if err != nil {
 		// just use nil-resource if failed to detect resource
