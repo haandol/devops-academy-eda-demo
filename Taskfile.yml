@@ -50,11 +50,7 @@ tasks:
       - task: build-app-image
         vars: {APP_NAME: "flight"}
       - task: build-app-image
-        vars: {APP_NAME: "saga"}
-      - task: build-app-image
         vars: {APP_NAME: "trip"}
-      - task: build-app-image
-        vars: {APP_NAME: "relay"}
       - task: build-migration-image
 
   push-all:
@@ -67,10 +63,4 @@ tasks:
       - task: push-image
         vars: {APP_NAME: "flight"}
       - task: push-image
-        vars: {APP_NAME: "saga"}
-      - task: push-image
         vars: {APP_NAME: "trip"}
-      - task: push-image
-        vars: {APP_NAME: "relay"}
-      - task: push-image
-        vars: {APP_NAME: "migration"}

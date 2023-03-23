@@ -13,10 +13,3 @@ const (
 	TripReserved    = "Reserved"
 	TripCanceled    = "Canceled"
 )
-
-// for saga
-const (
-	SagaStarted = "Started"
-	SagaEnded   = "Ended"
-	SagaAborted = "Aborted"
-)

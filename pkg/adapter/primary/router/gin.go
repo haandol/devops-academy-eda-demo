@@ -75,9 +75,9 @@ func getHandlerFunc(f any) gin.HandlerFunc {
 	}
 }
 
-// @title           devops-academy-eda-demo Saga API
+// @title           devops-academy-eda-demo API
 // @version         0.1
-// @description     devops-academy-eda-demo saga orchestration example api server
+// @description     devops-academy-eda-demo api server
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -95,15 +95,15 @@ func NewGinRouter(cfg *config.Config) *GinRouter {
 	r.SetTrustedProxies(nil)
 	r.Use(middleware.LeakBucket(&cfg.App))
 	r.Use(middleware.Timeout(&cfg.App))
-	r.Use(middleware.OtelTracing("saga"))
+	r.Use(middleware.OtelTracing("trip"))
 	r.Use(middleware.Cors())
 	r.Use(util.GinzapWithConfig(logger, &util.Config{
 		UTC:       false,
-		SkipPaths: []string{"/healthy"},
+		SkipPaths: []string{"/healthz"},
 	}))
 	r.Use(util.RecoveryWithZap(logger, true))
 
-	r.GET("/healthy", func(c *gin.Context) {
+	r.GET("/healthz", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK\n")
 	})
 
