@@ -64,7 +64,7 @@ export class CommonService extends Construct {
     });
     taskDefinition.addContainer(`Container`, {
       containerName: props.service.name.toLowerCase(),
-      image: ecs.ContainerImage.fromEcrRepository(serviceRepository),
+      image: ecs.ContainerImage.fromEcrRepository(serviceRepository, props.service.tag),
       logging,
       healthCheck: {
         command: [

@@ -4,11 +4,9 @@ import * as joi from 'joi';
 import * as toml from 'toml';
 import { SecurityGroupValidator, VpcValidator } from './validators';
 
-enum Service {
-  trip = 'trip',
-  car = 'car',
-  hotel = 'hotel',
-  flight = 'flight',
+type IService = {
+  name: string;
+  repositoryName: string;
 }
 
 export interface IConfig {
@@ -27,12 +25,14 @@ export interface IConfig {
     tableName: string;
   };
   service: {
-    [name in Service]: {
-      name: string;
+    common: {
       port: number;
-      repositoryName: string;
       tag: string;
-    };
+    }
+    trip: IService
+    car: IService
+    hotel: IService
+    flight: IService
   };
   securityGroups: {
     msk: string;
@@ -60,15 +60,28 @@ const schema = joi
     ddb: joi.object({
       tableName: joi.string().required(),
     }),
-    service: joi.object().pattern(
-      joi.string(),
-      joi.object({
-        name: joi.string().required(),
+    service: joi.object({
+      common: joi.object({
         port: joi.number().required(),
-        repositoryName: joi.string().required(),
         tag: joi.string().required(),
-      })
-    ),
+      }),
+      trip: joi.object({
+        name: joi.string().required(),
+        repositoryName: joi.string().required(),
+      }),
+      car: joi.object({
+        name: joi.string().required(),
+        repositoryName: joi.string().required(),
+      }),
+      hotel: joi.object({
+        name: joi.string().required(),
+        repositoryName: joi.string().required(),
+      }),
+      flight: joi.object({
+        name: joi.string().required(),
+        repositoryName: joi.string().required(),
+      }),
+    }),
     securityGroup: joi.object({
       msk: joi.string().custom(SecurityGroupValidator).required(),
     }),

@@ -61,9 +61,9 @@ const tripServiceStack = new TripServiceStack(
     taskSecurityGroup: ecsClusterStack.taskSecurityGroup,
     service: {
       name: Config.service.trip.name,
-      port: Config.service.trip.port,
       repositoryName: Config.service.trip.repositoryName,
-      tag: 'latest',
+      port: Config.service.common.port,
+      tag: Config.service.common.tag
     },
     env: {
       account: Config.aws.account,
