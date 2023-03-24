@@ -22,13 +22,13 @@ interface IProps {
 }
 
 export class CommonService extends Construct {
-  public readonly ecsService: ecs.IBaseService;
+  public readonly fargateService: ecs.FargateService;
 
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id);
 
     const taskDefinition = this.newTaskDefinition(props);
-    this.ecsService = this.newFargateService(taskDefinition, props);
+    this.fargateService = this.newFargateService(taskDefinition, props);
   }
 
   private newTaskDefinition(props: IProps): ecs.TaskDefinition {
@@ -89,7 +89,10 @@ export class CommonService extends Construct {
     return taskDefinition;
   }
 
-  private newFargateService(taskDefinition: ecs.TaskDefinition, props: IProps) {
+  private newFargateService(
+    taskDefinition: ecs.TaskDefinition,
+    props: IProps
+  ): ecs.FargateService {
     const ns = this.node.tryGetContext('ns') as string;
 
     const service = new ecs.FargateService(this, 'FargateService', {

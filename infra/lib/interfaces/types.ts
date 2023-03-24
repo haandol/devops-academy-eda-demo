@@ -12,6 +12,7 @@ export interface IServiceProps extends StackProps {
   readonly taskSecurityGroup: ec2.ISecurityGroup;
   readonly service: {
     name: string;
+    port: number;
     repositoryName: string;
   };
 }

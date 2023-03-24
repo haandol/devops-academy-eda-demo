@@ -29,6 +29,7 @@ export interface IConfig {
   service: {
     [name in Service]: {
       name: string;
+      port: number;
       repositoryName: string;
     };
   };
@@ -62,6 +63,7 @@ const schema = joi
       joi.string(),
       joi.object({
         name: joi.string().required(),
+        port: joi.number().required(),
         repositoryName: joi.string().required(),
       })
     ),

@@ -5,6 +5,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as cloudmap from 'aws-cdk-lib/aws-servicediscovery';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 
 interface IProps extends StackProps {
   vpc: ec2.IVpc;
@@ -16,6 +17,7 @@ export class EcsClusterStack extends Stack {
   public readonly taskExecutionRole: iam.IRole;
   public readonly taskLogGroup: logs.ILogGroup;
   public readonly taskSecurityGroup: ec2.ISecurityGroup;
+  public readonly alb: elbv2.IApplicationLoadBalancer;
 
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id, props);
@@ -26,6 +28,7 @@ export class EcsClusterStack extends Stack {
       this.newEcsTaskExecutionRole().withoutPolicyUpdates();
     this.taskLogGroup = this.newEcsTaskLogGroup();
     this.taskSecurityGroup = this.newSecurityGroup(props);
+    this.alb = this.newApplicationLoadBalancer(props, this.taskSecurityGroup);
   }
 
   newEcsTaskRole(): iam.Role {
@@ -168,5 +171,17 @@ export class EcsClusterStack extends Stack {
     );
 
     return securityGroup;
+  }
+
+  newApplicationLoadBalancer(
+    props: IProps,
+    securityGroup: ec2.ISecurityGroup
+  ): elbv2.IApplicationLoadBalancer {
+    const alb = new elbv2.ApplicationLoadBalancer(this, `ApplicationLB`, {
+      vpc: props.vpc,
+      internetFacing: true,
+      securityGroup,
+    });
+    return alb;
   }
 }

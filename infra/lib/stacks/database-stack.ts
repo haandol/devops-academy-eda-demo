@@ -23,6 +23,7 @@ export class DatabaseStack extends cdk.Stack {
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
       contributorInsightsEnabled: true,
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
     eventTable.addGlobalSecondaryIndex({
       indexName: 'GSI1',

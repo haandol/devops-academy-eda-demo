@@ -43,6 +43,8 @@ const tripServiceStack = new TripServiceStack(
   app,
   `${Config.app.ns}TripServiceStack`,
   {
+    vpc: vpcStack.vpc,
+    alb: ecsClusterStack.alb,
     cluster: ecsClusterStack.cluster,
     taskRole: ecsClusterStack.taskRole,
     taskLogGroup: ecsClusterStack.taskLogGroup,
@@ -50,6 +52,7 @@ const tripServiceStack = new TripServiceStack(
     taskSecurityGroup: ecsClusterStack.taskSecurityGroup,
     service: {
       name: Config.service.trip.name,
+      port: Config.service.trip.port,
       repositoryName: Config.service.trip.repositoryName,
     },
     env: {
