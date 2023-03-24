@@ -9,6 +9,7 @@ import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 
 interface IProps extends StackProps {
   vpc: ec2.IVpc;
+  mskSecurityGroupId: string;
 }
 
 export class EcsClusterStack extends Stack {
@@ -169,6 +170,9 @@ export class EcsClusterStack extends Stack {
       ec2.Port.allTcp(),
       'Internal Service'
     );
+    
+    const mskSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, 'MskSecurityGroup', props.mskSecurityGroupId);
+    mskSecurityGroup.addIngressRule(securityGroup, ec2.Port.tcpRange(9092, 9094), 'ECS Cluster to MSK');
 
     return securityGroup;
   }

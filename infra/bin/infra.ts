@@ -29,6 +29,7 @@ const vpcStack = new VpcStack(app, `${Config.app.ns}VpcStack`, {
 
 new BastionHostStack(app, `${Config.app.ns}BastionHostStack`, {
   vpcId: vpcStack.vpc.vpcId,
+  mskSecurityGroupId: Config.securityGroups.msk,
   env: {
     account: Config.aws.account,
     region: Config.aws.region,
@@ -40,6 +41,7 @@ const ecsClusterStack = new EcsClusterStack(
   `${Config.app.ns}EcsClusterStack`,
   {
     vpc: vpcStack.vpc,
+    mskSecurityGroupId: Config.securityGroups.msk,
     env: {
       account: Config.aws.account,
       region: Config.aws.region,
