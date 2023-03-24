@@ -14,18 +14,22 @@ id=""
 name="trip"
 port=8090
 repositoryName="trip"
+tag="latest"
 [service.car]
 name="car"
 port=8090
 repositoryName="car"
+tag="latest"
 [service.hotel]
 name="hotel"
 port=8090
 repositoryName="hotel"
+tag="latest"
 [service.flight]
 name="flight"
 port=8090
 repositoryName="flight"
+tag="latest"
 
 [ddb]
 tableName="trip"

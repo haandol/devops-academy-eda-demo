@@ -15,6 +15,8 @@ interface IProps {
   readonly service: {
     name: string;
     repositoryName: string;
+    port: number;
+    tag: string;
   };
   readonly desiredCount: number;
   readonly minCapacity: number;
@@ -67,10 +69,12 @@ export class CommonService extends Construct {
       healthCheck: {
         command: [
           'CMD-SHELL',
-          'curl -f http://localhost:8090/health/ || exit 1',
+          `curl -f http://localhost:${props.service.port}/healthz/ || exit 1`,
         ],
       },
-      portMappings: [{ containerPort: 8090, protocol: ecs.Protocol.TCP }],
+      portMappings: [
+        { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
+      ],
       secrets: props.taskEnvs,
     });
     taskDefinition.addContainer(`OTelContainer`, {
@@ -105,7 +109,7 @@ export class CommonService extends Construct {
       securityGroups: [props.taskSecurityGroup],
       cloudMapOptions: {
         name: props.service.name.toLowerCase(),
-        containerPort: 8090,
+        containerPort: props.service.port,
       },
     });
 

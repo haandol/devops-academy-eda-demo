@@ -54,6 +54,7 @@ const tripServiceStack = new TripServiceStack(
       name: Config.service.trip.name,
       port: Config.service.trip.port,
       repositoryName: Config.service.trip.repositoryName,
+      tag: 'latest',
     },
     env: {
       account: Config.aws.account,

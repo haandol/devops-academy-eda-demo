@@ -14,5 +14,6 @@ export interface IServiceProps extends StackProps {
     name: string;
     port: number;
     repositoryName: string;
+    tag: string;
   };
 }

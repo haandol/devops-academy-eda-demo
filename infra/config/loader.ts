@@ -31,6 +31,7 @@ export interface IConfig {
       name: string;
       port: number;
       repositoryName: string;
+      tag: string;
     };
   };
   securityGroups: {
@@ -65,6 +66,7 @@ const schema = joi
         name: joi.string().required(),
         port: joi.number().required(),
         repositoryName: joi.string().required(),
+        tag: joi.string().required(),
       })
     ),
     securityGroup: joi.object({

@@ -38,18 +38,3 @@ ARG APP_PORT
 EXPOSE ${APP_PORT}
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-
-# for schema migration
-FROM golang:alpine3.17 as migration
-ARG GIT_COMMIT=undefined
-LABEL git_commit=$GIT_COMMIT
-
-RUN apk add --no-cache aws-cli jq git
-RUN go install github.com/pressly/goose/v3/cmd/goose@latest
-
-WORKDIR /
-COPY ./init /init
-COPY ./env/dev.env /.env
-COPY ./scripts/migrate.sh /migrate.sh
-
-CMD ["/migrate.sh", "up"]
