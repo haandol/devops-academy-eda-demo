@@ -15,7 +15,7 @@ export class BastionHostStack extends Stack {
     this.newBastionHost(vpc);
   }
 
-  private newBastionHost(vpc: ec2.IVpc): ec2.BastionHostLinux {
+  newBastionHost(vpc: ec2.IVpc): ec2.BastionHostLinux {
     const bastionHost = new ec2.BastionHostLinux(this, `BastionHost`, {
       vpc,
       blockDevices: [
