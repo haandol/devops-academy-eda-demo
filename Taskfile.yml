@@ -44,7 +44,6 @@ tasks:
         vars: {APP_NAME: "flight"}
       - task: build-app-image
         vars: {APP_NAME: "trip"}
-      - task: build-migration-image
 
   push-all:
     deps: [ecr-login]
