@@ -27,7 +27,7 @@ export class BastionHostStack extends Stack {
         },
       ],
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
+        ec2.InstanceClass.M5,
         ec2.InstanceSize.LARGE
       ),
     });
