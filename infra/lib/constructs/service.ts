@@ -77,7 +77,7 @@ export class CommonService extends Construct {
     taskDefinition.addContainer(`OTelContainer`, {
       containerName: 'aws-otel-collector',
       image: ecs.ContainerImage.fromRegistry(
-        'public.ecr.aws/aws-observability/aws-otel-collector'
+        'public.ecr.aws/aws-observability/aws-otel-collector:v0.27.0'
       ),
       command: ['--config=/etc/ecs/ecs-default-config.yaml'],
       portMappings: [
