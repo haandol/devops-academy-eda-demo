@@ -20,9 +20,6 @@ export class HotelServiceStack extends Stack {
     new CommonService(this, 'HotelService', {
       ...props,
       taskEnvs,
-      desiredCount: 1,
-      minCapacity: 1,
-      maxCapacity: 3,
     });
   }
 }

@@ -20,9 +20,6 @@ export class FlightServiceStack extends Stack {
     new CommonService(this, 'FlightService', {
       ...props,
       taskEnvs,
-      desiredCount: 1,
-      minCapacity: 1,
-      maxCapacity: 3,
     });
   }
 }

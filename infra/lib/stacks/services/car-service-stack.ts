@@ -20,9 +20,6 @@ export class CarServiceStack extends Stack {
     new CommonService(this, 'CarService', {
       ...props,
       taskEnvs,
-      desiredCount: 1,
-      minCapacity: 1,
-      maxCapacity: 3,
     });
   }
 }

@@ -22,14 +22,16 @@ export class TripServiceStack extends Stack {
           stringValue: 'aws-otel-collector:4317',
         })
       ),
+      KAFKA_SEEDS: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvKafkaSeeds', {
+          stringValue: 'kafka:9093',
+        }),
+      ),
     };
 
     const tripService = new CommonService(this, 'TripService', {
       ...props,
       taskEnvs,
-      desiredCount: 1,
-      minCapacity: 1,
-      maxCapacity: 3,
     });
 
     this.registerServiceToLoadBalancer(tripService.fargateService, props);

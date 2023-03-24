@@ -18,9 +18,6 @@ interface IProps {
     port: number;
     tag: string;
   };
-  readonly desiredCount: number;
-  readonly minCapacity: number;
-  readonly maxCapacity: number;
 }
 
 export class CommonService extends Construct {
@@ -99,31 +96,18 @@ export class CommonService extends Construct {
   ): ecs.FargateService {
     const ns = this.node.tryGetContext('ns') as string;
 
-    const service = new ecs.FargateService(this, 'FargateService', {
+    return new ecs.FargateService(this, 'FargateService', {
       serviceName: `${ns}${props.service.name}`,
       platformVersion: ecs.FargatePlatformVersion.LATEST,
       cluster: props.cluster,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-      desiredCount: 1,
       taskDefinition,
       securityGroups: [props.taskSecurityGroup],
+      circuitBreaker: { rollback: true, },
       cloudMapOptions: {
         name: props.service.name.toLowerCase(),
         containerPort: props.service.port,
       },
     });
-
-    const scalableTarget = service.autoScaleTaskCount({
-      minCapacity: 1,
-      maxCapacity: 3,
-    });
-    scalableTarget.scaleOnCpuUtilization('CpuScaling', {
-      targetUtilizationPercent: 70,
-    });
-    scalableTarget.scaleOnMemoryUtilization('MemoryScaling', {
-      targetUtilizationPercent: 70,
-    });
-
-    return service;
   }
 }
