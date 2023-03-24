@@ -41,13 +41,13 @@ $ cp config/dev.toml .toml
 ### Create repositories
 
 ```bash
-$ task docker:create-repo
+$ task create-repo
 ```
 
 ### Push initial images
 
 ```bash
-$ task docker:push-echo
+$ task push-echo
 ```
 
 ### Create topics in MSK
