@@ -1,5 +1,5 @@
 [app]
-ns="DevOpsAcademy"
+ns="DevOpsDemo"
 stage="Dev"
 
 [aws]
@@ -8,6 +8,9 @@ region="ap-northeast-2"
 
 [vpc]
 id=""
+
+[securityGroups]
+msk=""
 
 [service]
 [service.trip]
@@ -33,6 +36,3 @@ tag="latest"
 
 [ddb]
 tableName="trip"
-
-[securityGroups]
-msk=""
