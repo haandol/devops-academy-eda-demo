@@ -19,12 +19,12 @@ export class TripServiceStack extends Stack {
     const taskEnvs = {
       OTEL_EXPORTER_OTLP_ENDPOINT: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvOtelExporterEndpoint', {
-          stringValue: 'aws-otel-collector:4317',
+          stringValue: '169.254.172.1:4317',
         })
       ),
       KAFKA_SEEDS: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvKafkaSeeds', {
-          stringValue: 'kafka:9093',
+          stringValue: 'b-2.demomskdev.krvxyx.c4.kafka.ap-northeast-2.amazonaws.com:9094,b-3.demomskdev.krvxyx.c4.kafka.ap-northeast-2.amazonaws.com:9094,b-1.demomskdev.krvxyx.c4.kafka.ap-northeast-2.amazonaws.com:9094',
         }),
       ),
     };
