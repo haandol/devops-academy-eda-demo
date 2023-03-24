@@ -60,7 +60,7 @@ tasks:
   create-topic:
     cmds:
       - |
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic trip --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic car --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic hotel --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic flight --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
+        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic trip-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
+        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic car-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
+        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic hotel-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
+        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic flight-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
