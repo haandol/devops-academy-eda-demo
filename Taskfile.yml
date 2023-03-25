@@ -57,10 +57,34 @@ tasks:
       - task: push-image
         vars: {APP_NAME: "trip"}
 
-  create-topic:
+  create-repo:
+    vars:
+      REPOSITORIES: |
+        trip
+        car
+        hotel
+        flight
+
     cmds:
       - |
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic trip-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic car-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic hotel-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
-        docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic flight-service --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_SEEDS
+        ARR=(`echo "{{.REPOSITORIES}}" | tr '\n' ' '`)
+        for REPO in ${ARR[@]}
+        do
+          aws ecr create-repository --repository-name ${REPO} {{.CLI_ARGS}}
+        done
+
+  create-topic:
+    vars:
+      TOPICS: |
+        trip-service
+        car-service
+        hotel-service
+        flight-service
+
+    cmds:
+      - |
+        ARR=(`echo "{{.TOPICS}}" | tr '\n' ' '`)
+        for TOPIC in ${ARR[@]}
+        do
+          docker run --rm haandol/kafka-cli:2.6.2 kafka-topics.sh --create --topic $TOPIC --partitions 3 --replication-factor 3 --bootstrap-server $KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+        done
