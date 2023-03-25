@@ -1,4 +1,4 @@
-import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy, CfnOutput } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -170,9 +170,17 @@ export class EcsClusterStack extends Stack {
       ec2.Port.allTcp(),
       'Internal Service'
     );
-    
-    const mskSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, 'MskSecurityGroup', props.mskSecurityGroupId);
-    mskSecurityGroup.addIngressRule(securityGroup, ec2.Port.tcpRange(9092, 9094), 'ECS Cluster to MSK');
+
+    const mskSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(
+      this,
+      'MskSecurityGroup',
+      props.mskSecurityGroupId
+    );
+    mskSecurityGroup.addIngressRule(
+      securityGroup,
+      ec2.Port.tcpRange(9092, 9094),
+      'ECS Cluster to MSK'
+    );
 
     return securityGroup;
   }
@@ -181,11 +189,19 @@ export class EcsClusterStack extends Stack {
     props: IProps,
     securityGroup: ec2.ISecurityGroup
   ): elbv2.IApplicationLoadBalancer {
+    const ns = this.node.tryGetContext('ns') as string;
+
     const alb = new elbv2.ApplicationLoadBalancer(this, `ApplicationLB`, {
       vpc: props.vpc,
       internetFacing: true,
       securityGroup,
     });
+
+    new CfnOutput(this, 'LoadBalancerDNS', {
+      exportName: `${ns}LoadBalancerDNS`,
+      value: alb.loadBalancerDnsName,
+    });
+
     return alb;
   }
 }
