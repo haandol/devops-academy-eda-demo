@@ -17,48 +17,27 @@ $ npm i -g aws-cdk
 $ npm i
 ```
 
-we are using [Taskfile](https://taskfile.dev/) for running script
-install taskfile cli
-
-```bash
-$ npm i -g @go-task/cli
-$ task --list-all
-```
-
 ## Configuration
 
 open [**config/dev.toml**](/infra/config/dev.toml) and fill the blow fields
+
+```toml
+[aws]
+account="" # e.g. 123456789012
+
+[vpc]
+id="" # e.g. vpc-xxx
+
+[msk]
+seeds="" # e.g. xxx:9094,yyy:9094
+securityGroupId="" # e.g. sg-xxx
+```
 
 and copy `config/dev.toml` file to project root as `.toml`
 
 ```bash
 $ cd infra
 $ cp config/dev.toml .toml
-```
-
-## Setup ECR repositories for services
-
-### Create repositories
-
-```bash
-$ task create-repo
-```
-
-### Push initial images
-
-```bash
-$ task push-echo
-```
-
-### Create topics in MSK
-
-- trip, 10 partitions, 3 replication factor, 2 min.insync.replicas
-- car, 10 partitions, 3 replication factor, 2 min.insync.replicas
-- hotel, 10 partitions, 3 replication factor, 2 min.insync.replicas
-- flight, 10 partitions, 3 replication factor, 2 min.insync.replicas
-
-```bash
-$ task create-topic
 ```
 
 ## Deploy for dev
