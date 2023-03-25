@@ -1,14 +1,6 @@
 version: '3'
 
 tasks:
-  build:
-    cmds:
-      - docker build -t echo .
-
-  login:
-    cmds:
-      - aws ecr get-login-password --region ap-northeast-2 {{.CLI_ARGS}} | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text {{.CLI_ARGS}}).dkr.ecr.ap-northeast-2.amazonaws.com"
-
   create-repo:
     vars:
       REPOSITORIES: |
@@ -23,23 +15,4 @@ tasks:
         for REPO in ${ARR[@]}
         do
           aws ecr create-repository --repository-name ${REPO} {{.CLI_ARGS}}
-        done
-
-  push-echo:
-    deps: [build, login]
-
-    vars:
-      REPOSITORIES: |
-        trip
-        car
-        hotel
-        flight
-
-    cmds:
-      - |
-        ARR=(`echo "{{.REPOSITORIES}}" | tr '\n' ' '`)
-        for REPO in ${ARR[@]}
-        do
-          docker tag echo "$(aws sts get-caller-identity --query Account --output text {{.CLI_ARGS}}).dkr.ecr.ap-northeast-2.amazonaws.com/${REPO}:latest"
-          docker push "$(aws sts get-caller-identity --query Account --output text {{.CLI_ARGS}}).dkr.ecr.ap-northeast-2.amazonaws.com/${REPO}:latest"
         done
