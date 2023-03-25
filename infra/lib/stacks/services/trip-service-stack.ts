@@ -10,6 +10,7 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 interface IProps extends IServiceProps {
   vpc: ec2.IVpc;
   alb: elbv2.IApplicationLoadBalancer;
+  kafkaSeeds: string;
 }
 
 export class TripServiceStack extends Stack {
@@ -24,8 +25,8 @@ export class TripServiceStack extends Stack {
       ),
       KAFKA_SEEDS: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvKafkaSeeds', {
-          stringValue: 'b-2.demomskdev.krvxyx.c4.kafka.ap-northeast-2.amazonaws.com:9094,b-3.demomskdev.krvxyx.c4.kafka.ap-northeast-2.amazonaws.com:9094,b-1.demomskdev.krvxyx.c4.kafka.ap-northeast-2.amazonaws.com:9094',
-        }),
+          stringValue: props.kafkaSeeds,
+        })
       ),
     };
 

@@ -9,8 +9,9 @@ region="ap-northeast-2"
 [vpc]
 id="" # e.g. vpc-xxx
 
-[securityGroups]
-msk="" # e.g. sg-xxx
+[msk]
+seeds="" # e.g. xxx:9094,yyy:9094
+securityGroupId="" # e.g. sg-xxx
 
 [service]
 [service.common]

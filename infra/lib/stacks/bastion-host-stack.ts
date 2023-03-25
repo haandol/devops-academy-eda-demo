@@ -31,6 +31,7 @@ export class BastionHostStack extends Stack {
         ec2.InstanceClass.M5,
         ec2.InstanceSize.LARGE
       ),
+      requireImdsv2: true,
     });
     bastionHost.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName(

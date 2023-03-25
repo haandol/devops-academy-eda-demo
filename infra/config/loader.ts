@@ -7,7 +7,7 @@ import { SecurityGroupValidator, VpcValidator } from './validators';
 type IService = {
   name: string;
   repositoryName: string;
-}
+};
 
 export interface IConfig {
   app: {
@@ -28,14 +28,15 @@ export interface IConfig {
     common: {
       port: number;
       tag: string;
-    }
-    trip: IService
-    car: IService
-    hotel: IService
-    flight: IService
+    };
+    trip: IService;
+    car: IService;
+    hotel: IService;
+    flight: IService;
   };
-  securityGroups: {
-    msk: string;
+  msk: {
+    seeds: string;
+    securityGroupId: string;
   };
 }
 
@@ -82,8 +83,9 @@ const schema = joi
         repositoryName: joi.string().required(),
       }),
     }),
-    securityGroup: joi.object({
-      msk: joi.string().custom(SecurityGroupValidator).required(),
+    msk: joi.object({
+      seeds: joi.string().required(),
+      securityGroupId: joi.string().custom(SecurityGroupValidator).required(),
     }),
   })
   .unknown();
