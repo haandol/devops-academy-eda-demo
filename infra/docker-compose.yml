@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - '8080:8080'
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SSL
