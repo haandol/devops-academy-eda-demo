@@ -27,10 +27,15 @@ type Database struct {
 	TableName string
 }
 
+type Rest struct {
+	HotelHost string
+}
+
 type Config struct {
 	App      App
 	Kafka    Kafka
 	Database Database
+	Rest     Rest
 }
 
 // Load config.Config from environment variables for each stage
@@ -59,6 +64,9 @@ func Load() Config {
 		},
 		Database: Database{
 			TableName: getEnv("DB_TABLE_NAME").String(),
+		},
+		Rest: Rest{
+			HotelHost: getEnv("REST_HOTEL_HOST").String(),
 		},
 	}
 

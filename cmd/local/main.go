@@ -26,7 +26,7 @@ func bootstrap(cfg *config.Config) {
 	applications = append(applications,
 		app.InitCarApp(cfg),
 		app.InitFlightApp(cfg),
-		app.InitHotelApp(cfg),
+		//		app.InitHotelApp(cfg),
 		app.InitTripApp(cfg),
 	)
 }

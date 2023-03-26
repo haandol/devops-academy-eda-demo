@@ -33,6 +33,8 @@ func (r *TripRouter) Route(rg routerport.RouterGroup) {
 	g := rg.Group("/trips")
 	g.Handle("POST", "/", r.WrappedHandler(r.CreateHandler))
 	g.Handle("GET", "/", r.WrappedHandler(r.ListHandler))
+	g.Handle("GET", "/hotels/error", r.WrappedHandler(r.GetInjectionStatusHandler))
+	g.Handle("POST", "/hotels/error", r.WrappedHandler(r.InjectErrorHandler))
 }
 
 // @Summary create new trip
@@ -80,4 +82,38 @@ func (r *TripRouter) ListHandler(c *gin.Context) *cerrors.CodedError {
 	}
 
 	return r.Success(c, trips)
+}
+
+// @Summary get error injection status from hotel service
+// @Schemes
+// @Description get error injection status from hotel service
+// @Tags trips
+// @Accept json
+// @Produce json
+// @Success 200 {object} bool
+// @Router /trips/hotels/error [get]
+func (r *TripRouter) GetInjectionStatusHandler(c *gin.Context) *cerrors.CodedError {
+	injectionStatus, err := r.tripService.GetInjectionStatus(c.Request.Context())
+	if err != nil {
+		return cerrors.New(constant.ErrInjectionError, err)
+	}
+
+	return r.Success(c, injectionStatus)
+}
+
+// @Summary inject error to hotel service
+// @Schemes
+// @Description inject error to hotel service
+// @Tags trips
+// @Accept json
+// @Produce json
+// @Success 200 {object} bool
+// @Router /trips/hotels/error [post]
+func (r *TripRouter) InjectErrorHandler(c *gin.Context) *cerrors.CodedError {
+	injectionStatus, err := r.tripService.InjectErrorHandler(c.Request.Context())
+	if err != nil {
+		return cerrors.New(constant.ErrInjectionError, err)
+	}
+
+	return r.Success(c, injectionStatus)
 }

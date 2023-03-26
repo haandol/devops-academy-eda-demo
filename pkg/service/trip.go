@@ -7,21 +7,25 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/message/event"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/producerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/repositoryport"
+	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/restport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
 )
 
 type TripService struct {
-	tripProducer   producerport.TripProducer
-	tripRepository repositoryport.TripRepository
+	tripProducer    producerport.TripProducer
+	tripRepository  repositoryport.TripRepository
+	tripRestAdapter restport.TripRestAdapter
 }
 
 func NewTripService(
 	tripProducer producerport.TripProducer,
 	tripRepository repositoryport.TripRepository,
+	tripRestAdapter restport.TripRestAdapter,
 ) *TripService {
 	return &TripService{
-		tripProducer:   tripProducer,
-		tripRepository: tripRepository,
+		tripProducer:    tripProducer,
+		tripRepository:  tripRepository,
+		tripRestAdapter: tripRestAdapter,
 	}
 }
 
@@ -74,4 +78,34 @@ func (s *TripService) List(ctx context.Context) ([]dto.Trip, error) {
 	}
 
 	return trips, nil
+}
+
+func (s *TripService) GetInjectionStatus(ctx context.Context) (bool, error) {
+	logger := util.GetLogger().WithContext(ctx).With(
+		"service", "TripService",
+		"method", "GetInjectionStatus",
+	)
+
+	injectionStatus, err := s.tripRestAdapter.GetInjectionStatus(ctx)
+	if err != nil {
+		logger.Errorw("failed to get error injection status from hotel", "err", err)
+		return false, err
+	}
+
+	return injectionStatus, nil
+}
+
+func (s *TripService) InjectErrorHandler(ctx context.Context) (bool, error) {
+	logger := util.GetLogger().WithContext(ctx).With(
+		"service", "TripService",
+		"method", "InjectErrorHandler",
+	)
+
+	injectionStatus, err := s.tripRestAdapter.InjectError(ctx)
+	if err != nil {
+		logger.Errorw("failed to inject error to hotel", "err", err)
+		return false, err
+	}
+
+	return injectionStatus, nil
 }

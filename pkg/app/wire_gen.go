@@ -13,6 +13,7 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/primary/router"
 	producer2 "github.com/haandol/devops-academy-eda-demo/pkg/adapter/secondary/producer"
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/secondary/repository"
+	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/secondary/rest"
 	"github.com/haandol/devops-academy-eda-demo/pkg/config"
 	"github.com/haandol/devops-academy-eda-demo/pkg/connector/cloud"
 	"github.com/haandol/devops-academy-eda-demo/pkg/connector/producer"
@@ -31,7 +32,8 @@ func InitTripApp(cfg *config.Config) port.App {
 	tripProducer := provideTripProducer(kafkaProducer)
 	client := provideDbClient(cfg)
 	tripRepository := repository.NewTripRepository(cfg, client)
-	tripService := service.NewTripService(tripProducer, tripRepository)
+	tripRestAdapter := rest.NewTripRestAdapter(cfg)
+	tripService := service.NewTripService(tripProducer, tripRepository, tripRestAdapter)
 	tripRouter := router.NewTripRouter(tripService)
 	tripConsumer := provideTripConsumer(cfg, tripService)
 	tripApp := NewTripApp(server, ginRouter, tripRouter, tripConsumer)
@@ -59,8 +61,9 @@ func InitHotelApp(cfg *config.Config) port.App {
 	client := provideDbClient(cfg)
 	hotelRepository := repository.NewHotelRepository(cfg, client)
 	hotelService := service.NewHotelService(hotelProducer, hotelRepository)
+	hotelRouter := router.NewHotelRouter(hotelService)
 	hotelConsumer := provideHotelConsumer(cfg, hotelService)
-	hotelApp := NewHotelApp(server, hotelConsumer)
+	hotelApp := NewHotelApp(server, ginRouter, hotelRouter, hotelConsumer)
 	return hotelApp
 }
 

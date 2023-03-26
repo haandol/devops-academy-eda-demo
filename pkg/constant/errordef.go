@@ -16,6 +16,7 @@ const (
 const (
 	ErrFailToCreateTrip = 40100
 	ErrFailToListTrip   = 40200
+	ErrInjectionError   = 40300
 )
 
 // Efs

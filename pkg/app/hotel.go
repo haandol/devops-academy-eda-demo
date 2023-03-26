@@ -10,22 +10,34 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/primary/consumer"
+	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/primary/router"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/primaryport/consumerport"
+	"github.com/haandol/devops-academy-eda-demo/pkg/port/primaryport/routerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
 )
 
 type HotelApp struct {
-	server   *http.Server
-	consumer consumerport.Consumer
+	server      *http.Server
+	routerGroup routerport.RouterGroup
+	routers     []routerport.Router
+	consumer    consumerport.Consumer
 }
 
 func NewHotelApp(
 	server *http.Server,
+	ginRouter *router.GinRouter,
+	hotelRouter *router.HotelRouter,
 	hotelConsumer *consumer.HotelConsumer,
 ) *HotelApp {
+	routers := []routerport.Router{
+		hotelRouter,
+	}
+
 	return &HotelApp{
-		server:   server,
-		consumer: hotelConsumer,
+		server:      server,
+		routerGroup: ginRouter,
+		routers:     routers,
+		consumer:    hotelConsumer,
 	}
 }
 
@@ -35,6 +47,12 @@ func (a *HotelApp) Init() {
 		"func", "Init",
 	)
 	logger.Info("Initializing App...")
+
+	v1 := a.routerGroup.Group("v1")
+	for _, router := range a.routers {
+		router.Route(v1)
+	}
+	logger.Info("routers are initialized.")
 
 	a.consumer.Init()
 
@@ -54,7 +72,7 @@ func (a *HotelApp) Start(ctx context.Context) error {
 			logger.Infow("Started and serving HTTP", "addr", a.server.Addr, "pid", os.Getpid())
 			if err := a.server.ListenAndServe(); err != nil {
 				if errors.Is(err, http.ErrServerClosed) {
-					logger.Info("server closed.")
+					logger.Info("Server closed.")
 					return err
 				} else {
 					logger.Errorw("ListenAndServe fail", "error", err)

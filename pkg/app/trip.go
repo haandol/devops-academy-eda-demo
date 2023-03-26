@@ -7,12 +7,13 @@ import (
 	"os"
 	"sync"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/primary/consumer"
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/primary/router"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/primaryport/consumerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/primaryport/routerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
-	"golang.org/x/sync/errgroup"
 )
 
 type TripApp struct {
@@ -63,7 +64,7 @@ func (a *TripApp) Start(ctx context.Context) error {
 		"module", "TripApp",
 		"func", "Start",
 	)
-	logger.Info("Starting...")
+	logger.Info("Starting App...")
 
 	g := new(errgroup.Group)
 	if a.server != nil {
@@ -71,10 +72,10 @@ func (a *TripApp) Start(ctx context.Context) error {
 			logger.Infow("Started and serving HTTP", "addr", a.server.Addr, "pid", os.Getpid())
 			if err := a.server.ListenAndServe(); err != nil {
 				if errors.Is(err, http.ErrServerClosed) {
-					logger.Info("server closed.")
+					logger.Info("Server closed.")
 					return err
 				} else {
-					logger.Errorw("listenAndServe fail", "error", err)
+					logger.Errorw("ListenAndServe fail", "error", err)
 					return err
 				}
 			}

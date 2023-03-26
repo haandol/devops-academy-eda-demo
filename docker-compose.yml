@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.9'
 
 services:
   zookeeper:
@@ -11,6 +11,7 @@ services:
     depends_on:
       - zookeeper
     image: bitnami/kafka:2.8.1
+    platform: linux/amd64
     restart: always
     profiles: ["backend"]
     ports:
@@ -56,7 +57,10 @@ services:
       - AWS_REGION=ap-northeast-2
     command: ["--config=/etc/otel-agent-config.yml"]
   dev:
-    image: cosmtrek/air:v1.41.0
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    command: ["air", "-c", ".air.local.toml"]
     profiles: ["dev"]
     working_dir: /src
     stop_signal: SIGINT
@@ -66,10 +70,26 @@ services:
       - ~/.aws:/root/.aws
     ports:
       - '8090:8090'
+  hotel:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    command: ["air", "-c", ".air.hotel.toml"]
+    profiles: ["hotel"]
+    working_dir: /src
+    stop_signal: SIGINT
+    stop_grace_period: 5s
+    volumes:
+      - .:/src
+      - ~/.aws:/root/.aws
+    ports:
+      - '8091:8090'
+    environment:
+      - APP_DISABLE_HTTP=false
   wire:
     build:
       context: .
-      dockerfile: ./Dockerfile.local
+      dockerfile: Dockerfile.local
     profiles: ["wire"]
     working_dir: /src/pkg/app
     command: [wire]

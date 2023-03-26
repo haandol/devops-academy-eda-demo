@@ -11,6 +11,7 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/primary/router"
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/secondary/producer"
 	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/secondary/repository"
+	"github.com/haandol/devops-academy-eda-demo/pkg/adapter/secondary/rest"
 	"github.com/haandol/devops-academy-eda-demo/pkg/config"
 	cloudconnector "github.com/haandol/devops-academy-eda-demo/pkg/connector/cloud"
 	kafkaproducer "github.com/haandol/devops-academy-eda-demo/pkg/connector/producer"
@@ -18,6 +19,7 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/primaryport/routerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/producerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/repositoryport"
+	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/restport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/service"
 )
 
@@ -80,6 +82,8 @@ func InitTripApp(cfg *config.Config) port.App {
 		wire.Bind(new(producerport.TripProducer), new(*producer.TripProducer)),
 		repository.NewTripRepository,
 		wire.Bind(new(repositoryport.TripRepository), new(*repository.TripRepository)),
+		rest.NewTripRestAdapter,
+		wire.Bind(new(restport.TripRestAdapter), new(*rest.TripRestAdapter)),
 		NewTripApp,
 		wire.Bind(new(port.App), new(*TripApp)),
 	)
@@ -138,6 +142,7 @@ func InitHotelApp(cfg *config.Config) port.App {
 		provideDbClient,
 		provideProducer,
 		provideRouters,
+		router.NewHotelRouter,
 		provideHotelConsumer,
 		service.NewHotelService,
 		provideHotelProducer,

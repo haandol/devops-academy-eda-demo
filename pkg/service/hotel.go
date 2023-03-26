@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/message/event"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/producerport"
@@ -10,7 +11,12 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/util/o11y"
 )
 
+var (
+	ErrErrorInjection = errors.New("error injected")
+)
+
 type HotelService struct {
+	ErrorFlag       bool
 	hotelProducer   producerport.HotelProducer
 	hotelRepository repositoryport.HotelRepository
 }
@@ -20,6 +26,7 @@ func NewHotelService(
 	hotelRepository repositoryport.HotelRepository,
 ) *HotelService {
 	return &HotelService{
+		ErrorFlag:       false,
 		hotelProducer:   hotelProducer,
 		hotelRepository: hotelRepository,
 	}
@@ -35,9 +42,18 @@ func (s *HotelService) Book(ctx context.Context, evt *event.CarBooked) error {
 	ctx, span := o11y.BeginSubSpan(ctx, "Book")
 	defer span.End()
 
+	if s.ErrorFlag {
+		logger.Errorw("Error injection")
+		span.RecordError(ErrErrorInjection)
+		span.SetStatus(o11y.GetStatus(ErrErrorInjection))
+		return ErrErrorInjection
+	}
+
 	booking, err := s.hotelRepository.Book(ctx, evt.Body.TripID)
 	if err != nil {
 		logger.Errorw("Failed to book hotel", "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return err
 	}
 
@@ -49,4 +65,26 @@ func (s *HotelService) Book(ctx context.Context, evt *event.CarBooked) error {
 	}
 
 	return nil
+}
+
+func (s *HotelService) ToggleErrorInjection(ctx context.Context) (bool, error) {
+	logger := util.GetLogger().WithContext(ctx).With(
+		"service", "HotelService",
+		"method", "ToggleErrorInjection",
+	)
+	logger.Debugw("Toggle error")
+
+	s.ErrorFlag = !s.ErrorFlag
+
+	return s.ErrorFlag, nil
+}
+
+func (s *HotelService) GetErrorFlag(ctx context.Context) bool {
+	logger := util.GetLogger().WithContext(ctx).With(
+		"service", "HotelService",
+		"method", "GetErrorFlag",
+	)
+	logger.Debugw("Get error flag")
+
+	return s.ErrorFlag
 }
