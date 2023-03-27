@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -22,29 +23,41 @@ func NewTripRestAdapter(cfg *config.Config) *TripRestAdapter {
 	}
 }
 
-func (a *TripRestAdapter) InjectError(ctx context.Context) (bool, error) {
+func (a *TripRestAdapter) InjectError(ctx context.Context, flag bool) error {
 	logger := util.GetLogger().With(
 		"module", "TripRestAdapter",
 		"func", "InjectError",
 	)
-	errorInjectionURL := fmt.Sprintf("%s/v1/hotels", a.Host)
-	req, err := http.NewRequestWithContext(ctx, "POST", errorInjectionURL, http.NoBody)
+
+	buf, err := json.Marshal(struct {
+		Flag bool `json:"flag"`
+	}{
+		Flag: flag,
+	})
 	if err != nil {
-		return false, err
+		return err
+	}
+
+	errorInjectionURL := fmt.Sprintf("%s/v1/hotels/error/", a.Host)
+	req, err := http.NewRequestWithContext(ctx, "PUT", errorInjectionURL, bytes.NewBuffer(buf))
+	if err != nil {
+		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{Timeout: time.Duration(30) * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, err
+		return err
 	}
-
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to inject error")
+	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	var data struct {
@@ -53,10 +66,10 @@ func (a *TripRestAdapter) InjectError(ctx context.Context) (bool, error) {
 	}
 	if err := json.Unmarshal(body, &data); err != nil {
 		logger.Error(err.Error())
-		return false, err
+		return err
 	}
 
-	return data.Data, nil
+	return nil
 }
 
 func (a *TripRestAdapter) GetInjectionStatus(ctx context.Context) (bool, error) {
@@ -64,7 +77,7 @@ func (a *TripRestAdapter) GetInjectionStatus(ctx context.Context) (bool, error) 
 		"module", "TripRestAdapter",
 		"func", "GetInjectionStatus",
 	)
-	errorInjectionURL := fmt.Sprintf("%s/v1/hotels", a.Host)
+	errorInjectionURL := fmt.Sprintf("%s/v1/hotels/error/", a.Host)
 	req, err := http.NewRequestWithContext(ctx, "GET", errorInjectionURL, http.NoBody)
 	if err != nil {
 		return false, err
@@ -76,7 +89,6 @@ func (a *TripRestAdapter) GetInjectionStatus(ctx context.Context) (bool, error) 
 	if err != nil {
 		return false, err
 	}
-
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)

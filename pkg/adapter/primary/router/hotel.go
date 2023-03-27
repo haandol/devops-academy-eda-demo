@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,7 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/primaryport/routerport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/service"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util/cerrors"
+	"github.com/haandol/devops-academy-eda-demo/pkg/util/o11y"
 )
 
 type HotelRouter struct {
@@ -26,8 +28,8 @@ func NewHotelRouter(
 
 func (r *HotelRouter) Route(rg routerport.RouterGroup) {
 	g := rg.Group("/hotels")
-	g.Handle("POST", "/", r.WrappedHandler(r.ToggleErrorInjection))
-	g.Handle("GET", "/", r.WrappedHandler(r.GetErrorFlag))
+	g.Handle("PUT", "/error/", r.WrappedHandler(r.InjectErrorHandler))
+	g.Handle("GET", "/error/", r.WrappedHandler(r.GetErrorFlagHandler))
 }
 
 // @Summary toggle error injection
@@ -37,17 +39,29 @@ func (r *HotelRouter) Route(rg routerport.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} bool
-// @Router /hotels/error [post]
-func (r *HotelRouter) ToggleErrorInjection(c *gin.Context) *cerrors.CodedError {
+// @Router /hotels/error [put]
+func (r *HotelRouter) InjectErrorHandler(c *gin.Context) *cerrors.CodedError {
+	var req struct {
+		Flag bool `json:"flag"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		return cerrors.New(constant.ErrBadRequest, err)
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
 	defer cancel()
 
-	errorFlag, err := r.hotelService.ToggleErrorInjection(ctx)
-	if err != nil {
+	ctx, span := o11y.BeginSpan(ctx, "InjectError")
+	defer span.End()
+	span.SetAttributes(
+		o11y.AttrString("Flag", fmt.Sprintf("%v", req.Flag)),
+	)
+
+	if err := r.hotelService.InjectError(ctx, req.Flag); err != nil {
 		return cerrors.New(constant.ErrFailToCreateTrip, err)
 	}
 
-	return r.Success(c, errorFlag)
+	return r.Success(c, req.Flag)
 }
 
 // @Summary check error flag
@@ -58,7 +72,7 @@ func (r *HotelRouter) ToggleErrorInjection(c *gin.Context) *cerrors.CodedError {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /hotels/error [get]
-func (r *HotelRouter) GetErrorFlag(c *gin.Context) *cerrors.CodedError {
+func (r *HotelRouter) GetErrorFlagHandler(c *gin.Context) *cerrors.CodedError {
 	errorFlag := r.hotelService.GetErrorFlag(c.Request.Context())
 
 	return r.Success(c, errorFlag)

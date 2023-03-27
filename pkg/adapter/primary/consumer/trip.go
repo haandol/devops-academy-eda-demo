@@ -65,7 +65,6 @@ func (c *TripConsumer) Handle(ctx context.Context, r *consumerport.Message) erro
 			logger.Errorw("Failed to unmarshal command", "err", err)
 			span.RecordError(err)
 			span.SetStatus(o11y.GetStatus(err))
-			span.SetStatus(o11y.GetStatus(err))
 			return err
 		}
 		return c.tripService.Complete(ctx, evt)

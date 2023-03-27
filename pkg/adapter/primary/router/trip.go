@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,11 +11,8 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/service"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util/cerrors"
+	"github.com/haandol/devops-academy-eda-demo/pkg/util/o11y"
 )
-
-type CreateTripRequest struct {
-	TripID string `json:"tripId" binding:"required" validate:"required"`
-}
 
 type TripRouter struct {
 	BaseRouter
@@ -33,8 +31,8 @@ func (r *TripRouter) Route(rg routerport.RouterGroup) {
 	g := rg.Group("/trips")
 	g.Handle("POST", "/", r.WrappedHandler(r.CreateHandler))
 	g.Handle("GET", "/", r.WrappedHandler(r.ListHandler))
-	g.Handle("GET", "/hotels/error", r.WrappedHandler(r.GetInjectionStatusHandler))
-	g.Handle("POST", "/hotels/error", r.WrappedHandler(r.InjectErrorHandler))
+	g.Handle("GET", "/hotels/error/", r.WrappedHandler(r.GetInjectionStatusHandler))
+	g.Handle("PUT", "/hotels/error/", r.WrappedHandler(r.InjectErrorHandler))
 }
 
 // @Summary create new trip
@@ -43,24 +41,33 @@ func (r *TripRouter) Route(rg routerport.RouterGroup) {
 // @Tags trips
 // @Accept json
 // @Produce json
-// @Param trip body dto.Trip true "trip id is required"
+// @Param tripId body tripId true "tripId is required"
 // @Success 200 {object} dto.Trip
 // @Router /trips [post]
 func (r *TripRouter) CreateHandler(c *gin.Context) *cerrors.CodedError {
-	req := &CreateTripRequest{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	var req struct {
+		TripID string `json:"tripId" binding:"required" validate:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		return cerrors.New(constant.ErrBadRequest, err)
 	}
-
-	if err := util.ValidateStruct(req); err != nil {
+	if err := util.ValidateStruct(&req); err != nil {
 		return cerrors.New(constant.ErrInvalidRequest, err)
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
 	defer cancel()
 
+	ctx, span := o11y.BeginSpan(ctx, "CreateHandler")
+	defer span.End()
+	span.SetAttributes(
+		o11y.AttrString("TripID", req.TripID),
+	)
+
 	trip, err := r.tripService.Create(ctx, req.TripID)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return cerrors.New(constant.ErrFailToCreateTrip, err)
 	}
 
@@ -107,13 +114,29 @@ func (r *TripRouter) GetInjectionStatusHandler(c *gin.Context) *cerrors.CodedErr
 // @Tags trips
 // @Accept json
 // @Produce json
+// @Param error body bool true "error is required"
 // @Success 200 {object} bool
-// @Router /trips/hotels/error [post]
+// @Router /trips/hotels/error [put]
 func (r *TripRouter) InjectErrorHandler(c *gin.Context) *cerrors.CodedError {
-	injectionStatus, err := r.tripService.InjectErrorHandler(c.Request.Context())
-	if err != nil {
+	var req struct {
+		Flag bool `json:"flag"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		return cerrors.New(constant.ErrBadRequest, err)
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
+	defer cancel()
+
+	ctx, span := o11y.BeginSpan(ctx, "CreateHandler")
+	defer span.End()
+	span.SetAttributes(
+		o11y.AttrString("Flag", fmt.Sprintf("%v", req.Flag)),
+	)
+
+	if err := r.tripService.InjectError(ctx, req.Flag); err != nil {
 		return cerrors.New(constant.ErrInjectionError, err)
 	}
 
-	return r.Success(c, injectionStatus)
+	return r.Success(c, req.Flag)
 }

@@ -95,17 +95,16 @@ func (s *TripService) GetInjectionStatus(ctx context.Context) (bool, error) {
 	return injectionStatus, nil
 }
 
-func (s *TripService) InjectErrorHandler(ctx context.Context) (bool, error) {
+func (s *TripService) InjectError(ctx context.Context, flag bool) error {
 	logger := util.GetLogger().WithContext(ctx).With(
 		"service", "TripService",
-		"method", "InjectErrorHandler",
+		"method", "InjectError",
 	)
 
-	injectionStatus, err := s.tripRestAdapter.InjectError(ctx)
-	if err != nil {
+	if err := s.tripRestAdapter.InjectError(ctx, flag); err != nil {
 		logger.Errorw("failed to inject error to hotel", "err", err)
-		return false, err
+		return err
 	}
 
-	return injectionStatus, nil
+	return nil
 }
