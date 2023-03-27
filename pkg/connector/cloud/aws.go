@@ -14,20 +14,21 @@ type AWSConfig struct {
 	Cfg aws.Config
 }
 
-func GetAWSConfig(dbCfg *config.Database) (*AWSConfig, error) {
+func GetAWSConfig(appCfg *config.AWS) (*AWSConfig, error) {
 	if awsCfg != nil {
 		return awsCfg, nil
 	}
 
 	optFns := []func(*awsconfig.LoadOptions) error{
-		awsconfig.WithRegion("ap-northeast-2"),
+		awsconfig.WithRegion(appCfg.Region),
 	}
-
-	if dbCfg.UseLocal {
+	if appCfg.UseLocal {
 		optFns = append(optFns, awsconfig.WithEndpointResolverWithOptions(
 			aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 				return aws.Endpoint{
-					URL: "http://dynamodb:8000",
+					PartitionID:   "0",
+					URL:           "http://dynamodb:8000",
+					SigningRegion: appCfg.Region,
 				}, nil
 			}),
 		))

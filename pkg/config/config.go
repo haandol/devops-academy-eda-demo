@@ -17,6 +17,11 @@ type App struct {
 	DisableHTTP             bool   `default:"false"`
 }
 
+type AWS struct {
+	UseLocal bool   `default:"false"`
+	Region   string `validate:"required"`
+}
+
 type Kafka struct {
 	Seeds            []string `validate:"required"`
 	MessageExpirySec int      `validate:"required,number"`
@@ -24,7 +29,6 @@ type Kafka struct {
 }
 
 type Database struct {
-	UseLocal  bool
 	TableName string
 }
 
@@ -34,6 +38,7 @@ type Rest struct {
 
 type Config struct {
 	App      App
+	AWS      AWS
 	Kafka    Kafka
 	Database Database
 	Rest     Rest
@@ -58,13 +63,16 @@ func Load() Config {
 			GracefulShutdownTimeout: getEnv("APP_GRACEFUL_SHUTDOWN_TIMEOUT").Int(),
 			DisableHTTP:             getEnv("APP_DISABLE_HTTP").Bool(),
 		},
+		AWS: AWS{
+			UseLocal: getEnv("AWS_USE_LOCAL").Bool(),
+			Region:   getEnv("AWS_REGION").String(),
+		},
 		Kafka: Kafka{
 			Seeds:            getEnv("KAFKA_SEEDS").Split(","),
 			MessageExpirySec: getEnv("KAFKA_MESSAGE_EXPIRY_SEC").Int(),
 			BatchSize:        getEnv("KAFKA_BATCH_SIZE").Int(),
 		},
 		Database: Database{
-			UseLocal:  getEnv("DB_USE_LOCAL").Bool(),
 			TableName: getEnv("DB_TABLE_NAME").String(),
 		},
 		Rest: Rest{
