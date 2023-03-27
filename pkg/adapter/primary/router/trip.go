@@ -45,6 +45,11 @@ func (r *TripRouter) Route(rg routerport.RouterGroup) {
 // @Success 200 {object} dto.Trip
 // @Router /trips [post]
 func (r *TripRouter) CreateHandler(c *gin.Context) *cerrors.CodedError {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
+	defer cancel()
+
+	span := o11y.SpanFromContext(ctx)
+
 	var req struct {
 		TripID string `json:"tripId" binding:"required" validate:"required"`
 	}
@@ -54,11 +59,6 @@ func (r *TripRouter) CreateHandler(c *gin.Context) *cerrors.CodedError {
 	if err := util.ValidateStruct(&req); err != nil {
 		return cerrors.New(constant.ErrInvalidRequest, err)
 	}
-
-	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
-	defer cancel()
-
-	span := o11y.SpanFromContext(ctx)
 	span.SetAttributes(
 		o11y.AttrString("TripID", req.TripID),
 	)
@@ -117,23 +117,24 @@ func (r *TripRouter) GetInjectionStatusHandler(c *gin.Context) *cerrors.CodedErr
 // @Success 200 {object} bool
 // @Router /trips/hotels/error [put]
 func (r *TripRouter) InjectErrorHandler(c *gin.Context) *cerrors.CodedError {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
+	defer cancel()
+
+	span := o11y.SpanFromContext(ctx)
+
 	var req struct {
 		Flag bool `json:"flag"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		return cerrors.New(constant.ErrBadRequest, err)
 	}
-
-	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
-	defer cancel()
-
-	ctx, span := o11y.BeginSpan(ctx, "CreateHandler")
-	defer span.End()
 	span.SetAttributes(
 		o11y.AttrString("Flag", fmt.Sprintf("%v", req.Flag)),
 	)
 
 	if err := r.tripService.InjectError(ctx, req.Flag); err != nil {
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return cerrors.New(constant.ErrInjectionError, err)
 	}
 

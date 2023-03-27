@@ -41,23 +41,24 @@ func (r *HotelRouter) Route(rg routerport.RouterGroup) {
 // @Success 200 {object} bool
 // @Router /hotels/error [put]
 func (r *HotelRouter) InjectErrorHandler(c *gin.Context) *cerrors.CodedError {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
+	defer cancel()
+
+	span := o11y.SpanFromContext(ctx)
+
 	var req struct {
 		Flag bool `json:"flag"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		return cerrors.New(constant.ErrBadRequest, err)
 	}
-
-	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
-	defer cancel()
-
-	ctx, span := o11y.BeginSpan(ctx, "InjectError")
-	defer span.End()
 	span.SetAttributes(
 		o11y.AttrString("Flag", fmt.Sprintf("%v", req.Flag)),
 	)
 
 	if err := r.hotelService.InjectError(ctx, req.Flag); err != nil {
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return cerrors.New(constant.ErrFailToCreateTrip, err)
 	}
 
@@ -74,6 +75,5 @@ func (r *HotelRouter) InjectErrorHandler(c *gin.Context) *cerrors.CodedError {
 // @Router /hotels/error [get]
 func (r *HotelRouter) GetErrorFlagHandler(c *gin.Context) *cerrors.CodedError {
 	errorFlag := r.hotelService.GetErrorFlag(c.Request.Context())
-
 	return r.Success(c, errorFlag)
 }
