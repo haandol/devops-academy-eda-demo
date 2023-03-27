@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/dto"
 	"github.com/haandol/devops-academy-eda-demo/pkg/message/event"
@@ -9,6 +10,7 @@ import (
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/repositoryport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/restport"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
+	"github.com/haandol/devops-academy-eda-demo/pkg/util/o11y"
 )
 
 type TripService struct {
@@ -36,15 +38,29 @@ func (s *TripService) Create(ctx context.Context, tripID string) (dto.Trip, erro
 		"method", "Create",
 	)
 
+	ctx, span := o11y.BeginSubSpan(ctx, "Create")
+	defer span.End()
+
+	span.SetAttributes(
+		o11y.AttrString("tripID", tripID),
+	)
+
 	trip, err := s.tripRepository.Create(ctx, tripID)
 	if err != nil {
 		logger.Errorw("failed to create trip", "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return dto.Trip{}, err
 	}
+	span.SetAttributes(
+		o11y.AttrString("trip", fmt.Sprintf("%v", trip)),
+	)
 
 	logger.Infow("publishing TripCreated", "trip", trip, "producer", s.tripProducer)
 	if err := s.tripProducer.PublishTripCreated(ctx, &trip); err != nil {
 		logger.Errorw("failed to publish TripCreated", "trip", trip, "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return dto.Trip{}, err
 	}
 
@@ -57,8 +73,17 @@ func (s *TripService) Complete(ctx context.Context, evt *event.FlightBooked) err
 		"method", "Complete",
 	)
 
+	ctx, span := o11y.BeginSubSpan(ctx, "Complete")
+	defer span.End()
+
+	span.SetAttributes(
+		o11y.AttrString("evt", fmt.Sprintf("%v", evt)),
+	)
+
 	if err := s.tripRepository.Complete(ctx, evt); err != nil {
 		logger.Errorw("failed to update trip booking", "event", evt, "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return err
 	}
 
@@ -101,8 +126,17 @@ func (s *TripService) InjectError(ctx context.Context, flag bool) error {
 		"method", "InjectError",
 	)
 
+	ctx, span := o11y.BeginSubSpan(ctx, "InjectError")
+	defer span.End()
+
+	span.SetAttributes(
+		o11y.AttrBool("flag", flag),
+	)
+
 	if err := s.tripRestAdapter.InjectError(ctx, flag); err != nil {
 		logger.Errorw("failed to inject error to hotel", "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
 		return err
 	}
 

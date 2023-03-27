@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/message/event"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/producerport"
@@ -35,11 +36,18 @@ func (s *CarService) Book(ctx context.Context, evt *event.TripCreated) error {
 	ctx, span := o11y.BeginSubSpan(ctx, "Book")
 	defer span.End()
 
+	span.SetAttributes(
+		o11y.AttrString("evt", fmt.Sprintf("%v", evt)),
+	)
+
 	booking, err := s.carRepository.Book(ctx, evt.Body.TripID)
 	if err != nil {
 		logger.Errorw("Failed to book car", "err", err)
 		return err
 	}
+	span.SetAttributes(
+		o11y.AttrString("booking", fmt.Sprintf("%v", booking)),
+	)
 
 	if err := s.carProducer.PublishCarBooked(ctx, &booking); err != nil {
 		logger.Errorw("Failed to publish CarBooked", "booking", booking, "err", err)

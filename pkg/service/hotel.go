@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/message/event"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/producerport"
@@ -42,6 +43,10 @@ func (s *HotelService) Book(ctx context.Context, evt *event.CarBooked) error {
 	ctx, span := o11y.BeginSubSpan(ctx, "Book")
 	defer span.End()
 
+	span.SetAttributes(
+		o11y.AttrString("evt", fmt.Sprintf("%v", evt)),
+	)
+
 	booking, err := s.hotelRepository.Book(ctx, evt.Body.TripID)
 	if err != nil {
 		logger.Errorw("Failed to book hotel", "err", err)
@@ -49,6 +54,9 @@ func (s *HotelService) Book(ctx context.Context, evt *event.CarBooked) error {
 		span.SetStatus(o11y.GetStatus(err))
 		return err
 	}
+	span.SetAttributes(
+		o11y.AttrString("booking", fmt.Sprintf("%v", booking)),
+	)
 
 	if s.ErrorFlag {
 		logger.Errorw("Error injection", "err", ErrErrorInjection, "booking", booking)

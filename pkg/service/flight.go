@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/message/event"
 	"github.com/haandol/devops-academy-eda-demo/pkg/port/secondaryport/producerport"
@@ -36,6 +37,10 @@ func (s *FlightService) Book(ctx context.Context, evt *event.HotelBooked) error 
 	ctx, span := o11y.BeginSubSpan(ctx, "Book")
 	defer span.End()
 
+	span.SetAttributes(
+		o11y.AttrString("evt", fmt.Sprintf("%v", evt)),
+	)
+
 	booking, err := s.flightRepository.Book(ctx, evt.Body.TripID)
 	if err != nil {
 		logger.Errorw("failed to book car", "err", err)
@@ -43,6 +48,9 @@ func (s *FlightService) Book(ctx context.Context, evt *event.HotelBooked) error 
 		span.SetStatus(o11y.GetStatus(err))
 		return err
 	}
+	span.SetAttributes(
+		o11y.AttrString("booking", fmt.Sprintf("%v", booking)),
+	)
 
 	if err := s.flightProducer.PublishFlightBooked(ctx, &booking); err != nil {
 		logger.Errorw("failed to publish flight booked", "err", err)

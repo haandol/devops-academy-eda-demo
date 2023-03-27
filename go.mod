@@ -18,6 +18,7 @@ require (
 	github.com/twmb/franz-go v1.13.1
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.15.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.40.0
 	go.opentelemetry.io/contrib/propagators/aws v1.15.0
 	go.opentelemetry.io/otel v1.14.0
@@ -43,6 +44,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.11 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.25 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.25 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.20.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.12.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.7 // indirect

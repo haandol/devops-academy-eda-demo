@@ -203,6 +203,10 @@ func AttrString(k, v string) attribute.KeyValue {
 	return attribute.String(k, v)
 }
 
+func AttrBool(k string, v bool) attribute.KeyValue {
+	return attribute.Bool(k, v)
+}
+
 func AttrInt(k string, v int) attribute.KeyValue {
 	return attribute.Int(k, v)
 }

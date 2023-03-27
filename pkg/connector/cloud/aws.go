@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/haandol/devops-academy-eda-demo/pkg/config"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws"
 )
 
 var awsCfg *AWSConfig
@@ -40,6 +41,9 @@ func GetAWSConfig(appCfg *config.AWS) (*AWSConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	// instrument aws sdk
+	otelaws.AppendMiddlewares(&cfg.APIOptions)
+
 	awsCfg = &AWSConfig{cfg}
 
 	return awsCfg, nil
