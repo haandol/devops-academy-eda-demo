@@ -58,8 +58,7 @@ func (r *TripRouter) CreateHandler(c *gin.Context) *cerrors.CodedError {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second*10)
 	defer cancel()
 
-	ctx, span := o11y.BeginSpan(ctx, "CreateHandler")
-	defer span.End()
+	span := o11y.SpanFromContext(ctx)
 	span.SetAttributes(
 		o11y.AttrString("TripID", req.TripID),
 	)

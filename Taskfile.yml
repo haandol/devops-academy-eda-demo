@@ -16,8 +16,10 @@ tasks:
         --endpoint-url http://localhost:8000
 
   ecr-login:
+    vars:
+      REGION: ap-northeast-2
     cmds:
-      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.ap-northeast-2.amazonaws.com"
+      - aws ecr get-login-password --region {{.REGION}} | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.{{.REGION}}.amazonaws.com"
 
   build-app-image:
     vars:
@@ -28,11 +30,12 @@ tasks:
 
   push-image:
     vars:
+      REGION: ap-northeast-2
       BUILD_TAG:
         sh: git rev-parse --short=10 HEAD
     cmds:
-      - docker tag {{.APP_NAME}}:{{.BUILD_TAG}} $(aws sts get-caller-identity --query Account --output text).dkr.ecr.ap-northeast-2.amazonaws.com/{{.APP_NAME}}:{{.BUILD_TAG}}
-      - docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.ap-northeast-2.amazonaws.com/{{.APP_NAME}}:{{.BUILD_TAG}}
+      - docker tag {{.APP_NAME}}:{{.BUILD_TAG}} $(aws sts get-caller-identity --query Account --output text).dkr.ecr.{{.REGION}}.amazonaws.com/{{.APP_NAME}}:{{.BUILD_TAG}}
+      - docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.{{.REGION}}.amazonaws.com/{{.APP_NAME}}:{{.BUILD_TAG}}
 
   build-all:
     cmds:

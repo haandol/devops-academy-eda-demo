@@ -169,6 +169,10 @@ func BeginSpanWithTraceID(ctx context.Context, corrID, parentID, name string) (c
 	return ctx, span
 }
 
+func SpanFromContext(ctx context.Context) trace.Span {
+	return trace.SpanFromContext(ctx)
+}
+
 func BeginSubSpan(ctx context.Context, name string) (context.Context, trace.Span) {
 	return tracer.Start(ctx, name)
 }

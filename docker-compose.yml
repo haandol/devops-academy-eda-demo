@@ -36,10 +36,11 @@ services:
       - '8000:8000'
   kafka-ui:
     depends_on:
+      - zookeeper
       - kafka
     image: provectuslabs/kafka-ui
     restart: always
-    profiles: ["ops"]
+    profiles: ["backend"]
     ports:
       - '8080:8080'
     environment:

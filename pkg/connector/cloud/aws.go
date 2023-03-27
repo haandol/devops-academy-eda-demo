@@ -23,15 +23,17 @@ func GetAWSConfig(appCfg *config.AWS) (*AWSConfig, error) {
 		awsconfig.WithRegion(appCfg.Region),
 	}
 	if appCfg.UseLocal {
-		optFns = append(optFns, awsconfig.WithEndpointResolverWithOptions(
-			aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-				return aws.Endpoint{
-					PartitionID:   "0",
-					URL:           "http://dynamodb:8000",
-					SigningRegion: appCfg.Region,
-				}, nil
-			}),
-		))
+		optFns = append(optFns,
+			awsconfig.WithEndpointResolverWithOptions(
+				aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+					return aws.Endpoint{
+						PartitionID:   "0",
+						URL:           "http://dynamodb:8000",
+						SigningRegion: appCfg.Region,
+					}, nil
+				}),
+			),
+		)
 	}
 
 	cfg, err := awsconfig.LoadDefaultConfig(context.TODO(), optFns...)
