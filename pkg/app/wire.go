@@ -25,7 +25,7 @@ import (
 
 // Common
 func provideDbClient(cfg *config.Config) *dynamodb.Client {
-	awsCfg, err := cloudconnector.GetAWSConfig()
+	awsCfg, err := cloudconnector.GetAWSConfig(&cfg.Database)
 	if err != nil {
 		panic(err)
 	}

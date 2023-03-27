@@ -84,7 +84,7 @@ func InitFlightApp(cfg *config.Config) port.App {
 
 // Common
 func provideDbClient(cfg *config.Config) *dynamodb.Client {
-	awsCfg, err := cloud.GetAWSConfig()
+	awsCfg, err := cloud.GetAWSConfig(&cfg.Database)
 	if err != nil {
 		panic(err)
 	}

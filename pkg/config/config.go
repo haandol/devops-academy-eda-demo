@@ -24,6 +24,7 @@ type Kafka struct {
 }
 
 type Database struct {
+	UseLocal  bool
 	TableName string
 }
 
@@ -63,6 +64,7 @@ func Load() Config {
 			BatchSize:        getEnv("KAFKA_BATCH_SIZE").Int(),
 		},
 		Database: Database{
+			UseLocal:  getEnv("DB_USE_LOCAL").Bool(),
 			TableName: getEnv("DB_TABLE_NAME").String(),
 		},
 		Rest: Rest{
