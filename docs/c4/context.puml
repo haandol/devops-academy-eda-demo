@@ -10,8 +10,8 @@ System_Boundary(b0, "Demo System") {
   SystemDb(db, "Database", "여행에 관련된 모든 정보(차량, 호텔, 비행기 예약 정보)를 저장")
 }
 
-Rel(client, trip, "여행정보 전달", "HTTP")
-Rel(trip, trip, "차량, 호텔, 비행편 예약", "Events")
+Rel_Neighbor(client, trip, "여행정보 전달", "HTTP")
+Rel_Neighbor(trip, trip, "차량, 호텔, 비행편 예약", "Events")
 Rel(trip, db, "각 예약정보에 대한 정보 저장")
 
 LAYOUT_WITH_LEGEND()
