@@ -15,11 +15,11 @@ Container_Boundary(b0, "Trip Reservation System") {
 ContainerDb(db, "Trip DB", "DynamoDB", "여행정보를 저장하는 DB")
 
 Rel(client, trip, "1. 여행예약 요청", "HTTP")
-Rel_Neighbor(trip, db, "2. 여행정보 저장", "HTTPS")
-Rel(trip, car, "3. TripCreated 이벤트 발생", "Kafka")
-Rel(car, hotel, "4. CarBooked 이벤트 발생", "Kafka")
+Rel(trip, db, "2. 여행정보 저장", "HTTPS")
+Rel_Neighbor(car, hotel, "4. CarBooked 이벤트 발생", "Kafka")
+Rel_Neighbor(trip, car, "3. TripCreated 이벤트 발생", "Kafka")
 Rel(hotel, flight, "5. HotelBooked 이벤트 발생", "Kafka")
-Rel(flight, trip, "6. FlightBooked 이벤트 발생", "Kafka")
+Rel_Neighbor(flight, trip, "6. FlightBooked 이벤트 발생", "Kafka")
 
 LAYOUT_WITH_LEGEND()
 @enduml
