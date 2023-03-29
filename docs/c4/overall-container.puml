@@ -6,6 +6,7 @@ title Overall Container Diagram
 Person(client, "User", "여행예약 시스템 이용자")
 
 Container_Boundary(b0, "Trip Reservation System") {
+  Container(ingress, "Loab Balancer", "Amazon ALB",  "URL 주소에 따라 서비스로 요청을 전달하는 L7 로드밸런서")
   Container(trip, "Trip Service", "golang",  "여행정보를 입력받아 차량, 호텔, 비행기를 한번에 예약해주는 서비스")
   Container(car, "Car Service", "golang",  "지정된 여행에 대한 차량을 예약해주는 서비스")
   Container(hotel, "Hotel Service", "golang",  "지정된 여행에 대한 호텔을 예약해주는 서비스")
@@ -14,12 +15,13 @@ Container_Boundary(b0, "Trip Reservation System") {
 
 ContainerDb(db, "Trip DB", "DynamoDB", "여행정보를 저장하는 DB")
 
-Rel(client, trip, "1. 여행예약 요청", "HTTP")
-Rel(trip, db, "2. 여행정보 저장", "HTTPS")
-Rel_Neighbor(car, hotel, "4. CarBooked 이벤트 발생", "Kafka")
-Rel_Neighbor(trip, car, "3. TripCreated 이벤트 발생", "Kafka")
-Rel(hotel, flight, "5. HotelBooked 이벤트 발생", "Kafka")
-Rel_Neighbor(flight, trip, "6. FlightBooked 이벤트 발생", "Kafka")
+Rel_Neighbor(client, ingress, "1. 여행예약 요청", "HTTP")
+Rel(ingress, trip, "2. 여행 서비스로 요청 전달", "HTTP")
+Rel_Neighbor(trip, db, "3. 여행정보 생성", "HTTPS")
+Rel_Neighbor(car, hotel, "5. CarBooked 이벤트 발생", "Kafka")
+Rel(trip, car, "4. TripCreated 이벤트 발생", "Kafka")
+Rel_Neighbor(hotel, flight, "6. HotelBooked 이벤트 발생", "Kafka")
+Rel(flight, trip, "7. FlightBooked 이벤트 발생", "Kafka")
 
 LAYOUT_WITH_LEGEND()
 @enduml
