@@ -16,7 +16,7 @@ securityGroupId="" # e.g. sg-xxx
 [service]
 [service.common]
 port=8090
-tag="a4b77e5b7d"
+tag="" # set build tag
 
 [service.trip]
 name="trip"
