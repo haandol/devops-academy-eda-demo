@@ -96,7 +96,7 @@ func NewGinRouter(cfg *config.Config) *GinRouter {
 	r.Use(middleware.LeakBucket(cfg.App.RPS))
 	r.Use(middleware.Timeout(cfg.App.TimeoutSec))
 	r.Use(middleware.OtelTracing("trip"))
-	r.Use(middleware.Authencate(cfg.App.AuthHeader))
+	r.Use(middleware.Authencate(cfg.App.AuthHeader, []string{"/healthz"}))
 	r.Use(middleware.Cors())
 	r.Use(util.GinzapWithConfig(logger, &util.Config{
 		UTC:       false,
