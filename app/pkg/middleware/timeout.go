@@ -5,12 +5,11 @@ import (
 
 	"github.com/gin-contrib/timeout"
 	"github.com/gin-gonic/gin"
-	"github.com/haandol/devops-academy-eda-demo/pkg/config"
 )
 
-func Timeout(cfg *config.App) gin.HandlerFunc {
+func Timeout(timeoutSec int) gin.HandlerFunc {
 	return timeout.New(
-		timeout.WithTimeout(time.Duration(cfg.TimeoutSec)*time.Second),
+		timeout.WithTimeout(time.Duration(timeoutSec)*time.Second),
 		timeout.WithHandler(func(c *gin.Context) {
 			c.Next()
 		}),

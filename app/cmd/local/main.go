@@ -24,10 +24,10 @@ var (
 // bootstrap - register apps
 func bootstrap(cfg *config.Config) {
 	applications = append(applications,
-		app.InitCarApp(cfg),
-		app.InitFlightApp(cfg),
-		//		app.InitHotelApp(cfg),
 		app.InitTripApp(cfg),
+		app.InitCarApp(cfg),
+		//		app.InitHotelApp(cfg),
+		app.InitFlightApp(cfg),
 	)
 }
 

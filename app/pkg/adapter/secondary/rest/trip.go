@@ -14,12 +14,14 @@ import (
 )
 
 type TripRestAdapter struct {
-	Host string
+	AuthHeader string
+	Host       string
 }
 
 func NewTripRestAdapter(cfg *config.Config) *TripRestAdapter {
 	return &TripRestAdapter{
-		Host: cfg.Rest.HotelHost,
+		AuthHeader: cfg.App.AuthHeader,
+		Host:       cfg.Rest.HotelHost,
 	}
 }
 
@@ -39,10 +41,12 @@ func (a *TripRestAdapter) InjectError(ctx context.Context, flag bool) error {
 	}
 
 	errorInjectionURL := fmt.Sprintf("%s/v1/hotels/error/", a.Host)
-	req, err := http.NewRequestWithContext(ctx, "PUT", errorInjectionURL, bytes.NewBuffer(buf))
+	req, err := http.NewRequestWithContext(ctx,
+		"PUT", errorInjectionURL, bytes.NewBuffer(buf))
 	if err != nil {
 		return err
 	}
+	req.Header.Add("Authorization", a.AuthHeader)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{Timeout: time.Duration(30) * time.Second}

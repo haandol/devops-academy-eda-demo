@@ -4,22 +4,21 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/haandol/devops-academy-eda-demo/pkg/config"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
 	"go.uber.org/ratelimit"
 )
 
-func LeakBucket(cfg *config.App) gin.HandlerFunc {
+func LeakBucket(rps int) gin.HandlerFunc {
 	logger := util.GetLogger().With(
 		"module", "Middleware",
 		"func", "LeakBucket",
 	)
 
 	var limiter ratelimit.Limiter
-	if cfg.RPS == 0 {
+	if rps == 0 {
 		limiter = ratelimit.NewUnlimited()
 	} else {
-		limiter = ratelimit.New(cfg.RPS)
+		limiter = ratelimit.New(rps)
 	}
 
 	prev := time.Now()

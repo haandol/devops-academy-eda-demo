@@ -12,6 +12,7 @@ type App struct {
 	Stage                   string `validate:"required"`
 	Port                    int    `validate:"required,number"`
 	RPS                     int    `validate:"required,number"`
+	AuthHeader              string `validate:"required"`
 	TimeoutSec              int    `validate:"required,number,gte=0"`
 	GracefulShutdownTimeout int    `validate:"required,number,gte=0"`
 	DisableHTTP             bool   `default:"false"`
@@ -59,6 +60,7 @@ func Load() Config {
 			Stage:                   getEnv("APP_STAGE").String(),
 			Port:                    getEnv("APP_PORT").Int(),
 			RPS:                     getEnv("APP_RPS").Int(),
+			AuthHeader:              getEnv("APP_AUTH_HEADER").String(),
 			TimeoutSec:              getEnv("APP_TIMEOUT_SEC").Int(),
 			GracefulShutdownTimeout: getEnv("APP_GRACEFUL_SHUTDOWN_TIMEOUT").Int(),
 			DisableHTTP:             getEnv("APP_DISABLE_HTTP").Bool(),

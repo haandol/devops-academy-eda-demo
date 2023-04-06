@@ -93,9 +93,10 @@ func NewGinRouter(cfg *config.Config) *GinRouter {
 
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
-	r.Use(middleware.LeakBucket(&cfg.App))
-	r.Use(middleware.Timeout(&cfg.App))
+	r.Use(middleware.LeakBucket(cfg.App.RPS))
+	r.Use(middleware.Timeout(cfg.App.TimeoutSec))
 	r.Use(middleware.OtelTracing("trip"))
+	r.Use(middleware.Authencate(cfg.App.AuthHeader))
 	r.Use(middleware.Cors())
 	r.Use(util.GinzapWithConfig(logger, &util.Config{
 		UTC:       false,

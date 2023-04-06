@@ -57,7 +57,7 @@ export class TripServiceStack extends Stack {
     new elbv2.ApplicationListener(this, 'Listener', {
       loadBalancer: props.alb,
       protocol: elbv2.ApplicationProtocol.HTTP,
-      port: 8000,
+      port: 80,
       defaultTargetGroups: [targetGroup],
     });
   }
