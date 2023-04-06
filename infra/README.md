@@ -1,4 +1,4 @@
-# Demo Infra
+# DevOps Academy Demo Infra
 
 # Prerequisites
 
@@ -13,7 +13,7 @@
 
 ```bash
 $ cd infra
-$ npm i -g aws-cdk
+$ npm i -g aws-cdk@2.72.1
 $ npm i
 ```
 
