@@ -1,5 +1,3 @@
 # Binaries for programs and plugins
-
 .env
 .DS_Store
-.vscode

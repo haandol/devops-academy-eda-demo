@@ -2,7 +2,6 @@ version: '3'
 
 dotenv: [.env]
 
-
 tasks:
   migrate:
     cmds:
@@ -40,25 +39,25 @@ tasks:
   build-all:
     cmds:
       - task: build-app-image
-        vars: {APP_NAME: "car"}
+        vars: { APP_NAME: 'car' }
       - task: build-app-image
-        vars: {APP_NAME: "hotel"}
+        vars: { APP_NAME: 'hotel' }
       - task: build-app-image
-        vars: {APP_NAME: "flight"}
+        vars: { APP_NAME: 'flight' }
       - task: build-app-image
-        vars: {APP_NAME: "trip"}
+        vars: { APP_NAME: 'trip' }
 
   push-all:
     deps: [ecr-login]
     cmds:
       - task: push-image
-        vars: {APP_NAME: "car"}
+        vars: { APP_NAME: 'car' }
       - task: push-image
-        vars: {APP_NAME: "hotel"}
+        vars: { APP_NAME: 'hotel' }
       - task: push-image
-        vars: {APP_NAME: "flight"}
+        vars: { APP_NAME: 'flight' }
       - task: push-image
-        vars: {APP_NAME: "trip"}
+        vars: { APP_NAME: 'trip' }
 
   create-repo:
     vars:

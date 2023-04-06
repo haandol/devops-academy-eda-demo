@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  allow-ingress:
+    cmds:
+      - |
+        export EC2_INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
+        echo $EC2_INSTANCE_ID
+
+        export SECURITY_GROUP_ID=$(aws ec2 describe-instances --instance-ids $EC2_INSTANCE_ID --query 'Reservations[0].Instances[0].NetworkInterfaces[0].Groups[0].GroupId' --output text)
+        echo $SECURITY_GROUP_ID
+
+        aws ec2 authorize-security-group-ingress \
+        --group-id $SECURITY_GROUP_ID \
+        --protocol "tcp" \
+        --port 8080-8082 \
+        --cidr "{{.CLI_ARGS}}/32"
