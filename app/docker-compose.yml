@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   zookeeper:
-    image: zookeeper
+    image: zookeeper:latest
     restart: always
     profiles: ["backend"]
     ports:
@@ -29,7 +29,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   dynamodb:
-    image: amazon/dynamodb-local:1.21.0
+    image: amazon/dynamodb-local:latest
     restart: always
     profiles: ["backend"]
     ports:
@@ -38,7 +38,7 @@ services:
     depends_on:
       - zookeeper
       - kafka
-    image: provectuslabs/kafka-ui
+    image: provectuslabs/kafka-ui:latest
     restart: always
     profiles: ["backend"]
     ports:
