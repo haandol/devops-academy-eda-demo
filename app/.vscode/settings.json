@@ -1,6 +1,4 @@
 {
   "editor.defaultFormatter": "golang.go",
   "editor.formatOnSave": true,
-  "aws.codeWhisperer.includeSuggestionsWithCodeReferences": false,
-  "aws.codeWhisperer.shareCodeWhispererContentWithAWS": false
 }
