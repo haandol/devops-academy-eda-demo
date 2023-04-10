@@ -28,7 +28,7 @@
 
 ### 추가설정
 
-- 기본 리전을 한국(ap-northeast-2)으로 설정합니다
+- 기본 리전을 한국(`ap-northeast-2`)으로 설정합니다
 
 ```bash
 aws configure set default.region ap-northeast-2
@@ -115,7 +115,7 @@ npm i
 ### 설정파일 수정
 
 - ECS 클러스터가 배포될 VPC, 각 서비스가 연결될 MSK 에 대한 설정을 수정합니다
-- **config/dev.toml** 파일을 열고 아래 명령어들을 통해 비어있는 필드들의 값을 추가합니다
+- [config/dev.toml](/infra/config/dev.toml) 파일을 열고 아래 명령어들을 통해 비어있는 필드들의 값을 추가합니다
 
 #### aws.account
 
@@ -152,7 +152,7 @@ git rev-parse --short=10 HEAD
 
 ### 설정파일 복사
 
-- 내용을 수정한 뒤, **dev.toml** 파일을 인프라 루트에 `.toml` 파일로 복사합니다
+- 내용을 수정한 뒤, [config/dev.toml](/infra/config/dev.toml) 파일을 인프라 루트에 `.toml` 파일로 복사합니다
 
 ```bash
 cp ./config/dev.toml ./.toml
@@ -324,7 +324,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
 
 - [Dynamodb 웹 콘솔](https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#item-explorer?table=trip&maximize=true) 에 접속합니다
 - **PK** 필드에 `TRIP#myTrip2` 입력후 **Run** 버튼 클릭합니다
-- myTrip1 과 달리 hotel, flight 부킹 정보가 생성되지 않았음을 확인할 수 있습니다
+- **myTrip1** 과 달리 hotel, flight 부킹 정보가 생성되지 않았음을 확인할 수 있습니다
 
 ![Dynamodb Query Trip2](/img/ddb-query-trip2.png)
 
@@ -351,7 +351,7 @@ watch -n 5 aws ecs describe-services --cluster DevOpsDemoDev --service DevOpsDem
 
 ### 생성된 여행 목록 가져오기
 
-- 모든 메시지가 Reserved 상태로 변경되었는지 확인합니다
+- 모든 메시지가 **Reserved** 상태로 변경되었는지 확인합니다
 
 ```bash
 http get $ALB/v1/trips/ x-auth-token:aws-devops
@@ -399,7 +399,7 @@ http get $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops
 
 ### 요청 재시도
 
-- myTrip3 는 Initialized 에서 변경되지 않는 것을 확인할 수 있습니다
+- **myTrip3** 는 **Initialized** 에서 변경되지 않는 것을 확인할 수 있습니다
 - **이 경우, 서비스 장애가 해결되어도 myTrip3 요청은 복구할 수 없습니다**
 
 ```bash
