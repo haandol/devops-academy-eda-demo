@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/haandol/devops-academy-eda-demo/pkg/config"
+	"github.com/haandol/devops-academy-eda-demo/pkg/constant"
 	"github.com/haandol/devops-academy-eda-demo/pkg/util"
 )
 
@@ -46,7 +47,7 @@ func (a *TripRestAdapter) InjectError(ctx context.Context, flag bool) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Add("Authorization", a.AuthHeader)
+	req.Header.Add(constant.AuthHeaderKey, a.AuthHeader)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{Timeout: time.Duration(30) * time.Second}
@@ -86,6 +87,7 @@ func (a *TripRestAdapter) GetInjectionStatus(ctx context.Context) (bool, error) 
 	if err != nil {
 		return false, err
 	}
+	req.Header.Add(constant.AuthHeaderKey, a.AuthHeader)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{Timeout: time.Duration(30) * time.Second}
