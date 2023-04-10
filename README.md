@@ -12,8 +12,7 @@
 ### EventEngine 설정
 
 - 아래 링크의 내용대로 이벤트 엔진 접속을 진행합니다
-
-https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/20-preq/200-event-engine
+  - https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/20-preq/200-event-engine
 
 ### AWS Cloud9 설정
 
@@ -40,9 +39,6 @@ aws configure set default.region ap-northeast-2
 ```bash
 wget https://gist.githubusercontent.com/haandol/45c1edfd1e3bf6f88655e655f161463d/raw/a95d52544e7e1a74ee720068b5281b23c4932df3/resize.sh
 sh resize.sh
-```
-
-```bash
 df -h
 ```
 
@@ -57,7 +53,7 @@ cd ~/environment/devops-academy-eda-demo/app
 
 ### TaskCLI 설치
 
-- 본 핸즈온에서는 GNU Make 를 사용하기 쉽게 만든 Task(https://taskfile.dev/) 빌드툴을 사용합니다
+- 본 핸즈온에서는 GNU Make 를 사용하기 쉽게 만든 [Task](https://taskfile.dev/) 빌드툴을 사용합니다
 
 ```bash
 npm install -g @go-task/cli
@@ -65,7 +61,7 @@ npm install -g @go-task/cli
 
 ### ECR 레포지토리 생성
 
-- 각 서비스별로 ecr 레포지토리(trip, car, hotel, flight) 를 AWSCLI 로 생성합니다
+- 각 서비스별로 ECR 레포지토리(trip, car, hotel, flight) 를 AWSCLI 로 생성합니다
 
 ```bash
 task create-repo
@@ -73,7 +69,7 @@ task create-repo
 
 ### 컨테이너 이미지 빌드
 
-- Dockerfile 을 통해 각 서비스 컨테이너 이미지를 빌드합니다
+- [Dockerfile](/app/Dockerfile) 을 통해 각 서비스 컨테이너 이미지를 빌드합니다
 
 ```bash
 task build-all
@@ -93,7 +89,7 @@ docker images
 task push-all
 ```
 
-- ECR 콘솔(https://ap-northeast-2.console.aws.amazon.com/ecr/repositories?region=ap-northeast-2) 로 이동해 푸시한 이미지를 확인합니다
+- [ECR 콘솔](https://ap-northeast-2.console.aws.amazon.com/ecr/repositories?region=ap-northeast-2) 로 이동해 푸시한 이미지를 확인합니다
 
 ## CDK 로 MSK 클러스터 확인
 
@@ -118,11 +114,8 @@ npm i
 
 ### 설정파일 수정
 
-#### CDK 설정 수정
-
 - ECS 클러스터가 배포될 VPC, 각 서비스가 연결될 MSK 에 대한 설정을 수정합니다
 - **config/dev.toml** 파일을 열고 아래 명령어들을 통해 비어있는 필드들의 값을 추가합니다
-- 내용을 수정한 뒤, **dev.toml** 파일을 인프라 루트에 `.toml` 파일로 복사합니다
 
 #### aws.account
 
@@ -130,7 +123,7 @@ npm i
 aws sts get-caller-identity --query 'Account' --output text
 ```
 
-#### [vpc.id](http://vpc.id/)
+#### vpc.id
 
 ```bash
 aws ec2 describe-vpcs --filters 'Name=tag:namespace,Values=day4demo' --query 'Vpcs[0].VpcId' --output text
@@ -159,6 +152,8 @@ git rev-parse --short=10 HEAD
 
 ### 설정파일 복사
 
+- 내용을 수정한 뒤, **dev.toml** 파일을 인프라 루트에 `.toml` 파일로 복사합니다
+
 ```bash
 cp ./config/dev.toml ./.toml
 ```
@@ -180,8 +175,7 @@ cdk deploy "*" --concurrency 4 --require-approval never
 
 ### ECS 클러스터 확인
 
-- 아래 ECS 웹 콘솔에 방문하여 4개의 서비스가 모두 실행중인지 확인합니다
-- https://ap-northeast-2.console.aws.amazon.com/ecs/v2/clusters/DevOpsDemoDev/services?region=ap-northeast-2
+- [ECS 웹 콘솔](https://ap-northeast-2.console.aws.amazon.com/ecs/v2/clusters/DevOpsDemoDev/services?region=ap-northeast-2)에 방문하여 4개의 서비스가 모두 실행중인지 확인합니다
 
 ![ECS Cluster](/img/ecs-cluster.png)
 
@@ -189,7 +183,7 @@ cdk deploy "*" --concurrency 4 --require-approval never
 
 ### HTTPie 설치
 
-- cURL 을 사용하기 쉽게 만든 터미널 기반 도구입니다 (https://httpie.io/)
+- [Httpie](https://httpie.io/) 는 cURL 을 사용하기 쉽게 만든 터미널 기반 도구입니다
 
 ```bash
 pip3 install httpie
@@ -204,15 +198,15 @@ echo $ALB
 
 ### 여행예약 요청하기
 
-- 모든 요청에는 인증용 헤더 **`x-auth-token:aws-devops`** 가 필요합니다
+- 모든 요청에는 인증용 헤더 `x-auth-token:aws-devops` 가 필요합니다
 
 ```bash
-http post $ALB/v1/trips/ x-auth-token:aws-devops **tripId****=myTrip1**
+http post $ALB/v1/trips/ x-auth-token:aws-devops tripId=myTrip1
 ```
 
 ### 생성된 데이터 확인하기
 
-- DynamoDB 웹 콘솔([https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#table?name=trip)](https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#table?name=trip) 로 이동합니다
+- [DynamoDB 웹 콘솔](https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#table?name=trip) 로 이동합니다
 - Explore Table Item 버튼 클릭하여 생성된 레코드 확인합니다
 
 ![Dynamodb Table](/img/ddb-table.png)
@@ -221,7 +215,7 @@ http post $ALB/v1/trips/ x-auth-token:aws-devops **tripId****=myTrip1**
 
 ### 생성된 여행 목록 가져오기
 
-- myTrip1 여행이 Reserved status 로 반환되는 것을 확인합니다
+- _myTrip1_ 여행이 **Reserved** status 로 반환되는 것을 확인합니다
 
 ```bash
 http get $ALB/v1/trips/ x-auth-token:aws-devops
@@ -229,7 +223,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
 
 ## X-Ray 로 트레이스 확인
 
-- Cloudwatch Traces(https://ap-northeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-2#xray:traces/query) 메뉴로 이동합니다
+- [Cloudwatch Traces](https://ap-northeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-2#xray:traces/query) 메뉴로 이동합니다
 - 쿼리창에 `http.method = "POST"` 입력후, **Run Query** 버튼을 클릭합니다
 - 하단 검색결과 Traces 에서 검색된 첫번째 트레이스 아이디를 클릭합니다
 - 서비스 맵을 확인합니다
@@ -255,7 +249,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
 ### 내 컴퓨터의 IP 주소 확인하기
 
 - Cloud9 이 아니라 현재 워크샵을 진행중인 개인 컴퓨터의 IP 주소를 확인합니다
-- 브라우저에서 https://ifconfig.me/ 로 접근해서 확인하거나, 아래의 명령어로 확인합니다
+- 브라우저에서 [ifconfig.me](https://ifconfig.me/) 로 접근해서 확인하거나, 아래의 명령어로 확인합니다
 
 ```bash
 curl -s ifconfig.me
@@ -267,8 +261,8 @@ curl -s ifconfig.me
 
 ```bash
 cd ~/environment/devops-academy-eda-demo/infra
-**task allow-ingress --** [위에서 확인 한 아이피주소]
-# e.g. **task allow-ingress --** **39.115.51.141**
+task allow-ingress -- [위에서 확인 한 아이피주소]
+# e.g. task allow-ingress -- 39.115.52.111
 ```
 
 ### docker-compose 설치
@@ -315,7 +309,7 @@ aws ecs describe-services --cluster DevOpsDemoDev --service DevOpsDemoDevhotel -
 ### 여행예약 요청
 
 ```bash
-http post $ALB/v1/trips/ x-auth-token:aws-devops **tripId****=myTrip2**
+http post $ALB/v1/trips/ x-auth-token:aws-devops tripId=myTrip2
 ```
 
 ### 생성된 여행 목록 가져오기
@@ -328,7 +322,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
 
 ### 데이터베이스 부킹정보 확인
 
-- https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#item-explorer?table=trip&maximize=true
+- [Dynamodb 웹 콘솔](https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#item-explorer?table=trip&maximize=true) 에 접속합니다
 - **PK** 필드에 `TRIP#myTrip2` 입력후 **Run** 버튼 클릭합니다
 - myTrip1 과 달리 hotel, flight 부킹 정보가 생성되지 않았음을 확인할 수 있습니다
 
@@ -342,8 +336,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
 
 ### Tracing 정보 확인
 
-- X-Ray 의 트레이스 메뉴를 통해 트레이스 정보를 확인합니다
-  - [https://ap-northeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-2#xray:traces/](https://ap-northeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-2#xray:traces/query)
+- [X-Ray 의 트레이스 메뉴](https://ap-northeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-2#xray:traces/)를 통해 트레이스 정보를 확인합니다
 - 쿼리창에 `http.method = "POST"` 입력후, **Run Query** 버튼 클릭합니다
 - 서비스 맵에서도 hotel, flight 서비스가 보이지 않는 것 확인합니다
 
@@ -372,7 +365,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
   - `:=` 에 주의. httpie 의 raw json input 인디케이터입니다
 
 ```bash
-http put $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops **flag****:=true**
+http put $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops flag:=true
 ```
 
 ### Hotel 장애주입 여부 확인
@@ -384,14 +377,13 @@ http get $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops
 ### 여행예약 요청 및 확인
 
 ```bash
-http post $ALB/v1/trips/ x-auth-token:aws-devops **tripId****=myTrip3**
+http post $ALB/v1/trips/ x-auth-token:aws-devops tripId=myTrip3
 http get $ALB/v1/trips/ x-auth-token:aws-devops
 ```
 
 ### 트레이스 확인
 
-- X-Ray 의 트레이스를 통해 장애 발생한 부분 및 상세내용을 확인합니다
-- https://ap-northeast-1.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-1#xray:service-map/map
+- [X-Ray 의 트레이스](https://ap-northeast-1.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-1#xray:service-map/map) 를 통해 장애 발생한 부분 및 상세내용을 확인합니다
 
 ### Kafka UI 확인
 
