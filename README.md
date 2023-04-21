@@ -374,6 +374,43 @@ http put $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops flag:=true
 http get $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops
 ```
 
+### 장애 코드
+
+```golang
+// service/hotel.go
+...
+
+  // 데이터베이스에 부킹정보를 저장합니다
+	booking, err := s.hotelRepository.Book(ctx, evt.Body.TripID)
+	if err != nil {
+		logger.Errorw("Failed to book hotel", "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
+		return err
+	}
+	span.SetAttributes(
+		o11y.AttrString("booking", fmt.Sprintf("%v", booking)),
+	)
+
+  // 장애 주입시 에러를 리턴합니다
+	if s.ErrorFlag {
+		logger.Errorw("Error injection", "err", ErrErrorInjection, "booking", booking)
+		span.RecordError(ErrErrorInjection)
+		span.SetStatus(o11y.GetStatus(ErrErrorInjection))
+		return ErrErrorInjection
+	}
+
+  // 카프카에 호텔부킹완료 이벤트를 발행합니다
+	if err := s.hotelProducer.PublishHotelBooked(ctx, &booking); err != nil {
+		logger.Errorw("Failed to publish HotelBooked", "booking", booking, "err", err)
+		span.RecordError(err)
+		span.SetStatus(o11y.GetStatus(err))
+		return err
+	}
+
+...
+```
+
 ### 여행예약 요청 및 확인
 
 ```bash
