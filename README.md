@@ -1,32 +1,68 @@
 # Day-4 Hand-on Runbook
 
-# Hands-on Lab 1
-
 ## 목표
 
 - 개발환경을 설정합니다
 - ECS 클러스터에 서비스들을 배포합니다
 
-## 개발 환경 설정
-
-### EventEngine 설정
+## EventEngine 설정
 
 - 아래 링크의 내용대로 이벤트 엔진 접속을 진행합니다
   - https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/20-preq/200-event-engine
 
-### AWS Cloud9 설정
+## AWS Cloud9 설정
 
-- 아래 링크 내용대로 Cloud9 을 설정합니다
-  - https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/30-setting/100-aws-cloud9
-- Cloud9 생성시 네트워크 설정 메뉴에서
-  - VPC 를, 기본 VPC 대신 `MskStack` 으로 표시된 VPC 를 선택합니다
-  - Subnet 은 `PublicSubnet1` 을 선택합니다
-    - VPC 설정을 하지 않아도 핸즈온 진행에는 문제가 없습니다
-    - 다만, Cloud9 에서 MSK 에 접근할 수 없으므로 카프카에 쌓인 메시지를 Kafka-UI 툴로 확인할 수 없습니다
-- 위 문서에서 마지막 GetCallerIdentity CLI 명령어 입력시 `grep 부분은 빼고` 입력합니다
-  - `aws sts get-caller-identity --query Arn`
+#### AWS Cloud9으로 IDE 구성
+
+1. [AWS Cloud9 콘솔창](https://console.aws.amazon.com/cloud9) 에 접속한 후, **Create environment** 버튼을 클릭합니다.
+
+2. IDE 이름을 적은 후, Next step을 클릭합니다. 본 실습에서는 **devops-day4** 로 입력합니다.
+
+3. 인스턴스 타입(instance type)을 other instance type 라디오 버튼을 클릭 후, **t3.small**으로 선택합니다. 플랫폼(platform)의 경우, **Amazon Linux 2 (recommended)** 를 선택하고, Next step을 클릭하여 지정한 속성 값을 확인한 후, **Create environment**를 클릭합니다.
+
+4. 네트워크 설정 메뉴에서 **VPC 설정**을 클릭합니다. 기본 VPC 대신 **MskStack/Vpc** 으로 표시된 VPC 를 선택합니다. Subnet 은 **PublicSubnet1** 을 선택합니다
+
+   > VPC 설정을 하지 않아도 핸즈온 진행에는 문제가 없습니다. 다만, Cloud9 에서 MSK 에 접근할 수 없으므로 카프카에 쌓인 메시지를 Kafka-UI 툴로 확인할 수 없습니다
 
 ![C9 network settings](/img/c9-network.png)
+
+5. 생성이 완료되면 아래와 같은 화면이 나타납니다.
+
+<img src="https://static.us-east-1.prod.workshops.aws/public/e7ab9b91-502d-4ada-84e2-5c8b92d8f791/static/images/30-setting/aws_cloud9_01.png" />
+
+### IDE(AWS Cloud9 인스턴스)에 IAM Role 부여
+
+AWS Cloud9 환경은 EC2 인스턴스로 구동됩니다. 따라서 EC2 콘솔에서 AWS Cloud9 인스턴스에 방금 생성한 IAM Role을 부여합니다.
+
+1. [여기](https://console.aws.amazon.com/ec2/v2/home?#Instances:sort=desc:launchTime) 를 클릭하여 EC2 인스턴스 페이지에 접속합니다.
+
+2. 해당 인스턴스를 선택 후, **Actions > Security > Modify IAM Role**을 클릭합니다.
+
+3. IAM Role 에서 `Day4DemoAdminInstanceProfile`을 선택한 후, Save 버튼을 클릭합니다.
+
+### IDE에서 IAM 설정 업데이트
+
+AWS Cloud9의 경우, IAM credentials를 동적으로 관리합니다. 해당 credentials는 **실습상 리소스 프로비저닝시 제약이 있기 때문에** 이를 비활성화하고 IAM Role을 붙입니다.
+
+1. AWS Cloud9 콘솔창에서 생성한 IDE로 다시 접속한 후, 우측 상단에 기어 아이콘을 클릭한 후, 사이드 바에서 **AWS SETTINGS**를 클릭합니다.
+
+2. **Credentials** 항목에서 **AWS managed temporary credentials** 설정을 비활성화합니다.
+
+3. Preference tab을 종료합니다.
+
+<img src="https://static.us-east-1.prod.workshops.aws/public/e7ab9b91-502d-4ada-84e2-5c8b92d8f791/static/images/30-setting/aws_cloud9_05.png" />
+
+4. **Temporary credentials** 이 없는지 확실히 하기 위해 기존의 자격 증명 파일도 제거합니다.
+
+```bash
+rm -vf ${HOME}/.aws/credentials
+```
+
+5. **GetCallerIdentity CLI** 명령어를 통해, Cloud9 IDE가 올바른 IAM Role을 사용하고 있는지 확인하세요. **결과 값이 나오면** 올바르게 설정된 것입니다.
+
+```bash
+aws sts get-caller-identity
+```
 
 ### 추가설정
 
