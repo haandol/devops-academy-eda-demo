@@ -134,8 +134,8 @@ task push-all
 ## CDK 로 MSK 클러스터 확인
 
 - 실습시간 단축을 위해 MSK 클러스터는 각 계정에 미리 배포되어 있습니다
-- 추후 개인계정에 MSK 를 배포해보실 분들은, 아래 레포지토리를 이용해 배포해볼 수 있습니다
-  - https://github.com/haandol/cdk-msk-example
+- 추후 개인계정에 MSK 를 배포해보실 분들은, 아래 클라우드 포메이션 템플릿을 배포해서 VPC 와 MSK 클러스터를 생성하시면 됩니다.
+  - [devops.template.json](/devops.template.json)
 
 ## CDK 로 ECS 클러스터 설정
 
