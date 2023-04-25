@@ -18,7 +18,7 @@
 
 2. IDE 이름을 적은 후, Next step을 클릭합니다. 본 실습에서는 **devops-day4** 로 입력합니다.
 
-3. 인스턴스 타입(instance type)을 other instance type 라디오 버튼을 클릭 후, **t3.small**으로 선택합니다.
+3. 인스턴스 타입(instance type)을 **m5.large** 로 선택합니다.
 
 4. 네트워크 설정 메뉴에서 **VPC 설정**을 클릭합니다. 기본 VPC 대신 **MskStack/Vpc** 으로 표시된 VPC 를 선택합니다. Subnet 은 **PublicSubnet1** 을 선택합니다
 
