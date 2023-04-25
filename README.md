@@ -101,7 +101,7 @@ npm install -g @go-task/cli
 
 ### ECR 레포지토리 생성
 
-- 각 서비스별로 ECR 레포지토리(trip, car, hotel, flight) 를 AWSCLI 로 생성합니다.
+- 각 서비스별로 [ECR 레포지토리](https://ap-northeast-2.console.aws.amazon.com/ecr/repositories?region=ap-northeast-2)(trip, car, hotel, flight) 를 AWSCLI 로 생성합니다.
 
 ```bash
 task create-repo
