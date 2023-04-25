@@ -416,9 +416,9 @@ http get $ALB/v1/trips/hotels/error/ x-auth-token:aws-devops
 
 ### 장애 코드
 
-```golang
-/* service/hotel.go */
+[service/hotel.go](/app/pkg/service/hotel.go)
 
+```golang
 // 데이터베이스에 부킹정보를 저장합니다
 booking, err := s.hotelRepository.Book(ctx, evt.Body.TripID)
 if err != nil {
