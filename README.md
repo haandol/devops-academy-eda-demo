@@ -23,6 +23,8 @@
   - Subnet 은 `PublicSubnet1` 을 선택합니다
     - VPC 설정을 하지 않아도 핸즈온 진행에는 문제가 없습니다
     - 다만, Cloud9 에서 MSK 에 접근할 수 없으므로 카프카에 쌓인 메시지를 Kafka-UI 툴로 확인할 수 없습니다
+- 위 문서에서 마지막 GetCallerIdentity CLI 명령어 입력시 `grep 부분은 빼고` 입력합니다
+  - `aws sts get-caller-identity --query Arn`
 
 ![C9 network settings](/img/c9-network.png)
 
