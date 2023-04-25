@@ -301,8 +301,8 @@ curl -s ifconfig.me
 
 ```bash
 cd ~/environment/devops-academy-eda-demo/infra
-task allow-ingress -- [위에서 확인 한 아이피주소]
 # e.g. task allow-ingress -- 39.115.52.111
+task allow-ingress -- [위에서 확인 한 아이피주소]
 ```
 
 ### docker-compose 설치
