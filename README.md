@@ -457,7 +457,7 @@ http get $ALB/v1/trips/ x-auth-token:aws-devops
 
 ### 트레이스 확인
 
-- [X-Ray 의 트레이스](https://ap-northeast-1.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-1#xray:service-map/map) 를 통해 장애 발생한 부분 및 상세내용을 확인합니다.
+- [X-Ray 의 트레이스](https://ap-northeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-2#xray:service-map/map) 를 통해 장애 발생한 부분 및 상세내용을 확인합니다.
 
 ### Kafka UI 확인
 
