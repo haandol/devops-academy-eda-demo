@@ -24,9 +24,9 @@
 
    > VPC 설정을 하지 않아도 핸즈온 진행에는 문제가 없습니다. 다만, Cloud9 에서 MSK 에 접근할 수 없으므로 카프카에 쌓인 메시지를 Kafka-UI 툴로 확인할 수 없습니다
 
-5. 하단의 **Create**를 클릭하여 생성합니다.
-
 ![C9 network settings](/img/c9-network.png)
+
+5. 하단의 **Create**를 클릭하여 생성합니다.
 
 6. 생성이 완료되면 아래와 같은 화면이 나타납니다.
 
@@ -40,7 +40,7 @@ AWS Cloud9 환경은 EC2 인스턴스로 구동됩니다. 따라서 EC2 콘솔�
 
 2. 해당 인스턴스를 선택 후, **Actions > Security > Modify IAM Role**을 클릭합니다.
 
-3. IAM Role 에서 `Day4DemoAdminInstanceProfile`을 선택한 후, Save 버튼을 클릭합니다.
+3. IAM Role 에서 `Day4DemoAdminInstanceProfile`을 선택한 후, **Update IAM role** 버튼을 클릭합니다.
 
 ### IDE에서 IAM 설정 업데이트
 
@@ -63,7 +63,7 @@ rm -vf ${HOME}/.aws/credentials
 5. **GetCallerIdentity CLI** 명령어를 통해, Cloud9 IDE가 올바른 IAM Role을 사용하고 있는지 확인하세요. **결과 값이 나오면** 올바르게 설정된 것입니다.
 
 ```bash
-aws sts get-caller-identity
+aws sts get-caller-identity --query Arn | grep day4DemoAdminRole
 ```
 
 ### 추가설정
