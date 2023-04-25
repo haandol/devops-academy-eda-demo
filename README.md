@@ -18,15 +18,17 @@
 
 2. IDE 이름을 적은 후, Next step을 클릭합니다. 본 실습에서는 **devops-day4** 로 입력합니다.
 
-3. 인스턴스 타입(instance type)을 other instance type 라디오 버튼을 클릭 후, **t3.small**으로 선택합니다. 플랫폼(platform)의 경우, **Amazon Linux 2 (recommended)** 를 선택하고, Next step을 클릭하여 지정한 속성 값을 확인한 후, **Create environment**를 클릭합니다.
+3. 인스턴스 타입(instance type)을 other instance type 라디오 버튼을 클릭 후, **t3.small**으로 선택합니다.
 
 4. 네트워크 설정 메뉴에서 **VPC 설정**을 클릭합니다. 기본 VPC 대신 **MskStack/Vpc** 으로 표시된 VPC 를 선택합니다. Subnet 은 **PublicSubnet1** 을 선택합니다
 
    > VPC 설정을 하지 않아도 핸즈온 진행에는 문제가 없습니다. 다만, Cloud9 에서 MSK 에 접근할 수 없으므로 카프카에 쌓인 메시지를 Kafka-UI 툴로 확인할 수 없습니다
 
+5. 하단의 **Create**를 클릭하여 생성합니다.
+
 ![C9 network settings](/img/c9-network.png)
 
-5. 생성이 완료되면 아래와 같은 화면이 나타납니다.
+6. 생성이 완료되면 아래와 같은 화면이 나타납니다.
 
 <img src="https://static.us-east-1.prod.workshops.aws/public/e7ab9b91-502d-4ada-84e2-5c8b92d8f791/static/images/30-setting/aws_cloud9_01.png" />
 
