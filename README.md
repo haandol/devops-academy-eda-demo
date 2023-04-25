@@ -20,7 +20,7 @@
 
 3. 인스턴스 타입(instance type)을 **m5.large** 로 선택합니다.
 
-4. 네트워크 설정 메뉴(networking settings)에서 **VPC 설정 (vpc settings)**을 클릭합니다. 기본 VPC 대신 **MskStack/Vpc** 으로 표시된 VPC 를 선택합니다. Subnet 은 **PublicSubnet1** 을 선택합니다
+4. 네트워크 설정 메뉴(networking settings)에서 **VPC 설정(vpc settings)**을 클릭합니다. 기본 VPC 대신 **MskStack/Vpc** 으로 표시된 VPC 를 선택합니다. Subnet 은 **PublicSubnet1** 을 선택합니다
 
    > VPC 설정을 하지 않아도 핸즈온 진행에는 문제가 없습니다. 다만, Cloud9 에서 MSK 에 접근할 수 없으므로 카프카에 쌓인 메시지를 Kafka-UI 툴로 확인할 수 없습니다
 
