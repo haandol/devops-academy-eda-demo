@@ -148,7 +148,7 @@ cd ~/environment/devops-academy-eda-demo/infra
 ### 의존성 설치
 
 ```bash
-npm i -g aws-cdk@2.76.0 --force
+npm i -g aws-cdk@2.74.0 --force
 npm i
 ```
 
