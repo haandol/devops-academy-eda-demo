@@ -343,7 +343,7 @@ http get http://169.254.169.254/latest/meta-data/public-ipv4
 
 ```bash
 aws ecs update-service --service DevOpsDemoDevhotel --cluster DevOpsDemoDev --desired-count 0
-aws ecs describe-services --cluster DevOpsDemoDev --service DevOpsDemoDevhotel --query services[0].runningCount
+watch -n 5 aws ecs describe-services --cluster DevOpsDemoDev --service DevOpsDemoDevhotel --query services[0].runningCount
 ```
 
 ### 여행예약 요청
