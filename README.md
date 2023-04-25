@@ -247,7 +247,7 @@ http post $ALB/v1/trips/ x-auth-token:aws-devops tripId=myTrip1
 ### 생성된 데이터 확인하기
 
 - [DynamoDB 웹 콘솔](https://ap-northeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-northeast-2#table?name=trip) 로 이동합니다.
-- Explore Table Item 버튼 클릭하여 생성된 레코드 확인합니다.
+- **Explore table Item** 버튼 클릭하여 생성된 레코드 확인합니다.
 
 ![Dynamodb Table](/img/ddb-table.png)
 
